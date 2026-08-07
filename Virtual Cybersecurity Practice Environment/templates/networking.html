@@ -1,0 +1,352 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Networking Fundamentals{% endblock %}
+
+{% block content %}
+<!-- Intro Banner -->
+<div class="glass-panel" style="padding: 1.5rem 2rem; border-left: 4px solid var(--accent-cyan); background: rgba(0, 240, 255, 0.01); margin-bottom: 1rem;">
+    <h2 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">Network Engineering for Security Practitioners</h2>
+    <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;">
+        Security tools depend on a strong foundation in routing, subnet calculations, and name resolution. Complete the learning tabs below and try the interactive Subnet Calculator.
+    </p>
+</div>
+
+<!-- Tabs for Topics -->
+<div class="card glass-panel" style="padding: 2rem;">
+    <div class="tabs-header">
+        <button class="tab-btn active" data-target="#tab-ip">IP & Subnets</button>
+        <button class="tab-btn" data-target="#tab-dhcp">DHCP & Static IP</button>
+        <button class="tab-btn" data-target="#tab-routing">Routing & DNS</button>
+        <button class="tab-btn" data-target="#tab-adapters">VM Adapter Modes</button>
+    </div>
+
+    <!-- Tab 1: IP & Subnetting -->
+    <div class="tab-pane active" id="tab-ip">
+        <h3 style="font-family: var(--font-heading); margin-bottom: 1rem; color: var(--accent-cyan);">IP Addressing and Subnet Divisions</h3>
+        <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">
+            IPv4 addresses consist of 32 bits, divided into four 8-bit octets (e.g., <code>192.168.1.1</code>). An IP address contains two components: the <strong>network prefix</strong> (identifying the specific subnet) and the <strong>host ID</strong> (identifying the individual device).
+        </p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem;">
+            <div>
+                <h4 style="font-family: var(--font-heading); font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.5rem;">CIDR Notation:</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
+                    Classless Inter-Domain Routing (CIDR) uses a slash followed by a number (e.g., <code>/24</code>) to denote the number of bits allocated to the network prefix. A <code>/24</code> subnet mask allocates 24 bits for the network, leaving 8 bits (256 values) for host addresses.
+                </p>
+            </div>
+            <div>
+                <h4 style="font-family: var(--font-heading); font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.5rem;">Private RFC 1918 Ranges:</h4>
+                <ul style="margin-left: 1.25rem; font-size: 0.85rem; line-height: 1.6; color: var(--text-secondary);">
+                    <li><code>10.0.0.0</code> – <code>10.255.255.255</code> (Class A)</li>
+                    <li><code>172.16.0.0</code> – <code>172.31.255.255</code> (Class B)</li>
+                    <li><code>192.168.0.0</code> – <code>192.168.255.255</code> (Class C)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 2: DHCP & Static -->
+    <div class="tab-pane" id="tab-dhcp">
+        <h3 style="font-family: var(--font-heading); margin-bottom: 1rem; color: var(--accent-cyan);">DHCP vs. Static Network Configuration</h3>
+        <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">
+            Devices require IP parameters to join a network. This can be handled dynamically or mapped manually.
+        </p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <div>
+                <h4 style="font-family: var(--font-heading); font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.5rem;">DHCP Lease Handshake (DORA):</h4>
+                <ol style="margin-left: 1.25rem; font-size: 0.85rem; line-height: 1.6; color: var(--text-secondary);">
+                    <li><strong>Discover:</strong> Client broadcasts a request for an IP address.</li>
+                    <li><strong>Offer:</strong> DHCP Server offers a lease on an IP address.</li>
+                    <li><strong>Request:</strong> Client requests the offered IP address.</li>
+                    <li><strong>Acknowledge:</strong> Server approves the lease and sends configuration details.</li>
+                </ol>
+            </div>
+            <div>
+                <h4 style="font-family: var(--font-heading); font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.5rem;">Static Linux Netplan Example:</h4>
+                <pre style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-glass); padding: 0.75rem; border-radius: 6px; font-family: var(--font-mono); font-size: 0.75rem; color: #fff; line-height: 1.4;">
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eth0:
+      addresses:
+        - 192.168.56.101/24
+      gateway4: 192.168.56.1
+      nameservers:
+        addresses: [8.8.8.8, 1.1.1.1]</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 3: Routing & DNS -->
+    <div class="tab-pane" id="tab-routing">
+        <h3 style="font-family: var(--font-heading); margin-bottom: 1rem; color: var(--accent-cyan);">Routing Tables & Domain Name Resolution</h3>
+        <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">
+            How packets move across networks and how systems locate servers.
+        </p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <div>
+                <h4 style="font-family: var(--font-heading); font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.5rem;">Packet Routing:</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
+                    A host uses its local **routing table** to determine where to send packets. If the destination IP is on the local subnet, the host sends it directly. If the destination is external, the packet is forwarded to the **default gateway** (your router) to be routed across networks.
+                </p>
+            </div>
+            <div>
+                <h4 style="font-family: var(--font-heading); font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.5rem;">DNS Resolution Flow:</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
+                    The Domain Name System (DNS) translates human-readable domain names (e.g., <code>example.com</code>) into computer-routable IP addresses. Clients query a DNS resolver, which checks its local cache before querying root servers, TLD servers, and authoritative name servers to resolve the domain.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 4: VM Adaptors -->
+    <div class="tab-pane" id="tab-adapters">
+        <h3 style="font-family: var(--font-heading); margin-bottom: 1rem; color: var(--accent-cyan);">Comparing Hypervisor Adapters</h3>
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; line-height: 1.6; text-align: left;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--border-glass);">
+                    <th style="padding: 0.75rem 0; width: 25%;">Mode</th>
+                    <th style="padding: 0.75rem 0; width: 25%;">VM to Internet</th>
+                    <th style="padding: 0.75rem 0; width: 25%;">Host to VM</th>
+                    <th style="padding: 0.75rem 0; width: 25%;">VM to VM</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid var(--border-glass);">
+                    <td style="padding: 0.75rem 0; font-weight: 500; color: var(--accent-cyan);">NAT (Network Address Translation)</td>
+                    <td>Yes (via Host Gateway)</td>
+                    <td>No (unless port forwarded)</td>
+                    <td>No (isolated from other VMs)</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-glass);">
+                    <td style="padding: 0.75rem 0; font-weight: 500; color: var(--accent-purple);">Host-Only</td>
+                    <td>No (Fully Isolated)</td>
+                    <td>Yes (via Virtual Adaptor)</td>
+                    <td>Yes (if on same subnet)</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-glass);">
+                    <td style="padding: 0.75rem 0; font-weight: 500;">Bridged Mode</td>
+                    <td>Yes (Direct access)</td>
+                    <td>Yes (Acts as LAN neighbor)</td>
+                    <td>Yes (via physical LAN)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Subnet Calculator Widget -->
+<div class="grid-container" style="margin-top: 1.5rem;">
+    <!-- Calculator inputs -->
+    <div class="card glass-panel" style="padding: 2rem;">
+        <h3 style="font-family: var(--font-heading); margin-bottom: 1rem; color: var(--accent-purple);">Interactive Subnet Calculator</h3>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.5;">
+            Input an IP address and select a CIDR subnet prefix to compute the network address parameters, broadcast domain, and total usable hosts.
+        </p>
+        
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div>
+                <label style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">IP Address</label>
+                <input type="text" id="calc-ip" class="glossary-search-input" value="192.168.56.101" style="font-family: var(--font-mono); font-size: 1rem; width: 100%;">
+            </div>
+            
+            <div>
+                <label style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">CIDR Prefix</label>
+                <select id="calc-cidr" class="glossary-search-input" style="width: 100%; color: var(--text-primary); background: #0f111a; border: 1px solid var(--border-glass);">
+                    <option value="30">/30 (4 hosts, 2 Usable)</option>
+                    <option value="29">/29 (8 hosts, 6 Usable)</option>
+                    <option value="28">/28 (16 hosts, 14 Usable)</option>
+                    <option value="27">/27 (32 hosts, 30 Usable)</option>
+                    <option value="26">/26 (64 hosts, 62 Usable)</option>
+                    <option value="25">/25 (128 hosts, 126 Usable)</option>
+                    <option value="24" selected>/24 (256 hosts, 254 Usable)</option>
+                    <option value="23">/23 (512 hosts, 510 Usable)</option>
+                    <option value="22">/22 (1024 hosts, 1022 Usable)</option>
+                    <option value="16">/16 (65,536 hosts, 65,534 Usable)</option>
+                    <option value="8">/8 (16.7M hosts, 16.7M Usable)</option>
+                </select>
+            </div>
+            
+            <button class="cli-run-btn" onclick="calculateSubnet()" style="width: 100%; margin-top: 0.5rem;">Calculate Subnet</button>
+        </div>
+    </div>
+
+    <!-- Results Panel -->
+    <div class="card glass-panel" style="padding: 2rem;">
+        <h3 style="font-family: var(--font-heading); margin-bottom: 1.25rem; color: var(--text-primary);">Network Calculations</h3>
+        
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; line-height: 1.8;">
+            <tbody>
+                <tr style="border-bottom: 1px solid var(--border-glass);">
+                    <td style="color: var(--text-muted); padding: 0.5rem 0;">Subnet Mask</td>
+                    <td style="font-family: var(--font-mono); font-weight: 600; color: var(--accent-cyan);" id="res-mask">255.255.255.0</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-glass);">
+                    <td style="color: var(--text-muted); padding: 0.5rem 0;">Network Address</td>
+                    <td style="font-family: var(--font-mono); font-weight: 600; color: var(--text-primary);" id="res-net">192.168.56.0</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-glass);">
+                    <td style="color: var(--text-muted); padding: 0.5rem 0;">Usable Range</td>
+                    <td style="font-family: var(--font-mono); color: var(--text-secondary);" id="res-range">192.168.56.1 - 192.168.56.254</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-glass);">
+                    <td style="color: var(--text-muted); padding: 0.5rem 0;">Broadcast Address</td>
+                    <td style="font-family: var(--font-mono); color: var(--text-secondary);" id="res-broad">192.168.56.255</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-glass);">
+                    <td style="color: var(--text-muted); padding: 0.5rem 0;">Total Usable Hosts</td>
+                    <td style="font-family: var(--font-mono); font-weight: 600; color: var(--accent-purple);" id="res-hosts">254</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Progress Tickers -->
+<div class="card glass-panel" style="margin-top: 2rem; padding: 2rem;">
+    <h3 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">Networking Checkpoints</h3>
+    <div class="grid-container" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+        <label class="step-card" style="cursor: pointer; padding: 0.75rem;">
+            <input type="checkbox" class="step-checkbox" id="check-net-ip" onchange="syncCheck('net_ip')" {% if progress.net_ip %}checked{% endif %}>
+            <div class="step-content">
+                <div class="step-title" style="font-size: 0.9rem;">IP Addressing</div>
+            </div>
+        </label>
+        <label class="step-card" style="cursor: pointer; padding: 0.75rem;">
+            <input type="checkbox" class="step-checkbox" id="check-net-subnet" onchange="syncCheck('net_subnet')" {% if progress.net_subnet %}checked{% endif %}>
+            <div class="step-content">
+                <div class="step-title" style="font-size: 0.9rem;">Subnet Divisions</div>
+            </div>
+        </label>
+        <label class="step-card" style="cursor: pointer; padding: 0.75rem;">
+            <input type="checkbox" class="step-checkbox" id="check-net-dhcp" onchange="syncCheck('net_dhcp')" {% if progress.net_dhcp %}checked{% endif %}>
+            <div class="step-content">
+                <div class="step-title" style="font-size: 0.9rem;">DHCP Mechanics</div>
+            </div>
+        </label>
+        <label class="step-card" style="cursor: pointer; padding: 0.75rem;">
+            <input type="checkbox" class="step-checkbox" id="check-net-static" onchange="syncCheck('net_static')" {% if progress.net_static %}checked{% endif %}>
+            <div class="step-content">
+                <div class="step-title" style="font-size: 0.9rem;">Static Configs</div>
+            </div>
+        </label>
+        <label class="step-card" style="cursor: pointer; padding: 0.75rem;">
+            <input type="checkbox" class="step-checkbox" id="check-net-routing" onchange="syncCheck('net_routing')" {% if progress.net_routing %}checked{% endif %}>
+            <div class="step-content">
+                <div class="step-title" style="font-size: 0.9rem;">Routing Paths</div>
+            </div>
+        </label>
+        <label class="step-card" style="cursor: pointer; padding: 0.75rem;">
+            <input type="checkbox" class="step-checkbox" id="check-net-dns" onchange="syncCheck('net_dns')" {% if progress.net_dns %}checked{% endif %}>
+            <div class="step-content">
+                <div class="step-title" style="font-size: 0.9rem;">DNS Resolution</div>
+            </div>
+        </label>
+        <label class="step-card" style="cursor: pointer; padding: 0.75rem;">
+            <input type="checkbox" class="step-checkbox" id="check-net-hostonly" onchange="syncCheck('net_hostonly')" {% if progress.net_hostonly %}checked{% endif %}>
+            <div class="step-content">
+                <div class="step-title" style="font-size: 0.9rem;">Host-Only LAN</div>
+            </div>
+        </label>
+        <label class="step-card" style="cursor: pointer; padding: 0.75rem;">
+            <input type="checkbox" class="step-checkbox" id="check-net-nat" onchange="syncCheck('net_nat')" {% if progress.net_nat %}checked{% endif %}>
+            <div class="step-content">
+                <div class="step-title" style="font-size: 0.9rem;">NAT Isolation</div>
+            </div>
+        </label>
+        <label class="step-card" style="cursor: pointer; padding: 0.75rem;">
+            <input type="checkbox" class="step-checkbox" id="check-net-bridge" onchange="syncCheck('net_bridge')" {% if progress.net_bridge %}checked{% endif %}>
+            <div class="step-content">
+                <div class="step-title" style="font-size: 0.9rem;">Bridged Modes</div>
+            </div>
+        </label>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function syncCheck(itemKey) {
+        const checkbox = document.getElementById(`check-${itemKey.replace(/_/g, '-')}`);
+        if (checkbox) {
+            toggleProgressItem(itemKey, checkbox.checked);
+        }
+    }
+
+    function calculateSubnet() {
+        const ipInput = document.getElementById('calc-ip').value.trim();
+        const cidr = parseInt(document.getElementById('calc-cidr').value);
+        
+        // Basic IPv4 regex validation
+        const ipv4Regex = /^^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+        if (!ipv4Regex.test(ipInput)) {
+            showToast("Invalid IPv4 address format!", "error");
+            return;
+        }
+
+        // Convert IP to 32-bit integer
+        const octets = ipInput.split('.').map(o => parseInt(o));
+        const ipInt = (octets[0] << 24) + (octets[1] << 16) + (octets[2] << 8) + octets[3];
+        
+        // Calculate Mask
+        const maskInt = cidr === 0 ? 0 : (~0 << (32 - cidr));
+        const maskOctets = [
+            (maskInt >>> 24) & 255,
+            (maskInt >>> 16) & 255,
+            (maskInt >>> 8) & 255,
+            maskInt & 255
+        ];
+        
+        // Calculate Network
+        const netInt = ipInt & maskInt;
+        const netOctets = [
+            (netInt >>> 24) & 255,
+            (netInt >>> 16) & 255,
+            (netInt >>> 8) & 255,
+            netInt & 255
+        ];
+
+        // Calculate Broadcast
+        const broadInt = netInt | ~maskInt;
+        const broadOctets = [
+            (broadInt >>> 24) & 255,
+            (broadInt >>> 16) & 255,
+            (broadInt >>> 8) & 255,
+            broadInt & 255
+        ];
+
+        // Usable hosts counts
+        const totalUsable = cidr >= 31 ? 0 : Math.pow(2, 32 - cidr) - 2;
+        
+        // Calculate Range
+        let rangeStr = "";
+        if (cidr >= 31) {
+            rangeStr = "N/A (Point-to-Point / Loopback)";
+        } else {
+            const firstUsableOctets = [...netOctets];
+            firstUsableOctets[3] += 1;
+            
+            const lastUsableOctets = [...broadOctets];
+            lastUsableOctets[3] -= 1;
+            
+            rangeStr = `${firstUsableOctets.join('.')}` + " - " + `${lastUsableOctets.join('.')}`;
+        }
+
+        // Update DOM
+        document.getElementById('res-mask').textContent = maskOctets.join('.');
+        document.getElementById('res-net').textContent = netOctets.join('.');
+        document.getElementById('res-range').textContent = rangeStr;
+        document.getElementById('res-broad').textContent = broadOctets.join('.');
+        document.getElementById('res-hosts').textContent = totalUsable.toLocaleString();
+        
+        showToast("Calculated subnet properties!");
+        
+        // Mark Subnet checkpoint as complete
+        const subChk = document.getElementById('check-net-subnet');
+        if (subChk && !subChk.checked) {
+            subChk.checked = true;
+            toggleProgressItem('net_subnet', true);
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Lab Installation Guide{% endblock %}
+
+{% block content %}
+<div class="glass-panel" style="padding: 1.5rem 2rem; border-left: 4px solid var(--accent-purple); background: rgba(189, 0, 255, 0.01); margin-bottom: 1rem;">
+    <h2 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">Virtual Hypervisor Environment Setup</h2>
+    <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;">
+        Building an isolated sandbox network requires careful configuration. Below is your step-by-step workbook for importing virtual nodes and establishing secure boundary routing. Check off each box as you complete the corresponding step. Your progress is saved in real-time.
+    </p>
+</div>
+
+<!-- Accordion Checklist -->
+<div class="accordion">
+    <!-- Step 1: Hypervisor -->
+    <div class="accordion-item glass-panel" id="accordion-vbox">
+        <button class="accordion-trigger">
+            <span style="display: flex; align-items: center; gap: 1rem;">
+                <input type="checkbox" class="step-checkbox" id="check-vbox" onchange="syncCheck('setup_vbox')" {% if progress.setup_vbox %}checked{% endif %} onclick="event.stopPropagation();">
+                <span>Step 1: Hypervisor Installation (VirtualBox / VMware)</span>
+            </span>
+            <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="accordion-content">
+            <div class="step-content">
+                <p style="font-size: 0.9rem; line-height: 1.6; color: var(--text-secondary); margin-bottom: 1rem;">
+                    A hypervisor allows you to run virtual guest operating systems on top of your host machine. We recommend <strong>VirtualBox</strong> (free, open-source) or <strong>VMware Workstation Player</strong>.
+                </p>
+                <h4 style="font-family: var(--font-heading); font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.5rem;">VirtualBox Setup:</h4>
+                <ol style="margin-left: 1.5rem; font-size: 0.85rem; line-height: 1.8; color: var(--text-secondary); margin-bottom: 1rem;">
+                    <li>Download the installer for your OS from the official portal: <a href="https://www.virtualbox.org/" target="_blank" style="color: var(--accent-cyan); text-decoration: none;">virtualbox.org</a>.</li>
+                    <li>Execute the installer and accept default settings (includes installing virtual network interfaces).</li>
+                    <li><strong>Crucial:</strong> Download and install the <em>VirtualBox Extension Pack</em> (adds support for USB 2.0/3.0 controllers and virtual disc acceleration).</li>
+                </ol>
+                <div class="alert-note" style="margin-top: 0.5rem;">
+                    <div class="alert-title">💡 Virtualization Notice</div>
+                    <p style="font-size: 0.8rem; margin: 0; line-height: 1.4;">
+                        Ensure Intel VT-x or AMD-V is enabled in your system's motherboard UEFI/BIOS settings, otherwise virtual machines will fail to boot or run extremely slowly.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 2: Kali Linux Attacker VM -->
+    <div class="accordion-item glass-panel" id="accordion-kali">
+        <button class="accordion-trigger">
+            <span style="display: flex; align-items: center; gap: 1rem;">
+                <input type="checkbox" class="step-checkbox" id="check-kali" onchange="syncCheck('setup_kali')" {% if progress.setup_kali %}checked{% endif %} onclick="event.stopPropagation();">
+                <span>Step 2: Attacker Workstation Setup (Kali Linux)</span>
+            </span>
+            <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="accordion-content">
+            <div class="step-content">
+                <p style="font-size: 0.9rem; line-height: 1.6; color: var(--text-secondary); margin-bottom: 1rem;">
+                    Kali Linux is the preeminent Linux distribution for offensive security simulations. Downloading the pre-built VirtualBox image (`.ova` format) saves configuration time.
+                </p>
+                <h4 style="font-family: var(--font-heading); font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.5rem;">Import Steps:</h4>
+                <ol style="margin-left: 1.5rem; font-size: 0.85rem; line-height: 1.8; color: var(--text-secondary); margin-bottom: 1rem;">
+                    <li>Download the VirtualBox Pre-built Image from <a href="https://www.kali.org/get-kali/" target="_blank" style="color: var(--accent-cyan); text-decoration: none;">kali.org/get-kali</a>.</li>
+                    <li>Unpack the downloaded zip file (`.7z` format) to your virtual storage drive.</li>
+                    <li>Double-click the extracted <code>.vbox</code> file or select "Import Appliance" in VirtualBox, locating the downloaded <code>.ova</code>.</li>
+                    <li>Verify configuration: Allocation of at least 2 vCPUs and 2048 MB RAM.</li>
+                    <li>Boot the machine. Default logins are: Username: <code>kali</code> | Password: <code>kali</code>.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 3: Windows Target VM -->
+    <div class="accordion-item glass-panel" id="accordion-win">
+        <button class="accordion-trigger">
+            <span style="display: flex; align-items: center; gap: 1rem;">
+                <input type="checkbox" class="step-checkbox" id="check-win" onchange="syncCheck('setup_win')" {% if progress.setup_win %}checked{% endif %} onclick="event.stopPropagation();">
+                <span>Step 3: Windows Defensive Target Setup</span>
+            </span>
+            <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="accordion-content">
+            <div class="step-content">
+                <p style="font-size: 0.9rem; line-height: 1.6; color: var(--text-secondary); margin-bottom: 1rem;">
+                    Practicing defender tasks (log reviewing, security policies) requires a Windows target. You can acquire evaluation licenses directly from Microsoft.
+                </p>
+                <h4 style="font-family: var(--font-heading); font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.5rem;">Installation Steps:</h4>
+                <ol style="margin-left: 1.5rem; font-size: 0.85rem; line-height: 1.8; color: var(--text-secondary); margin-bottom: 1rem;">
+                    <li>Download a free 90-day evaluation ISO for Windows 10/11 Enterprise from the <a href="https://www.microsoft.com/en-us/evalcenter/" target="_blank" style="color: var(--accent-cyan); text-decoration: none;">Microsoft Evaluation Center</a>.</li>
+                    <li>In VirtualBox, select "New". Choose Type: <code>Microsoft Windows</code>.</li>
+                    <li>Mount the downloaded ISO inside the virtual optical drive settings.</li>
+                    <li>Boot the VM and complete the standard installation. Name the default administrator account (e.g. <code>labuser</code>).</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 4: Metasploitable Vulnerable VM -->
+    <div class="accordion-item glass-panel" id="accordion-meta">
+        <button class="accordion-trigger">
+            <span style="display: flex; align-items: center; gap: 1rem;">
+                <input type="checkbox" class="step-checkbox" id="check-meta" onchange="syncCheck('setup_meta')" {% if progress.setup_meta %}checked{% endif %} onclick="event.stopPropagation();">
+                <span>Step 4: Vulnerable Lab Target Setup (Metasploitable 2)</span>
+            </span>
+            <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="accordion-content">
+            <div class="step-content">
+                <p style="font-size: 0.9rem; line-height: 1.6; color: var(--text-secondary); margin-bottom: 1rem;">
+                    Metasploitable 2 is a Linux machine built deliberately with outdated, exploitable packages. It acts as a target for vulnerability scanners and analysis.
+                </p>
+                <h4 style="font-family: var(--font-heading); font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.5rem;">Import Steps:</h4>
+                <ol style="margin-left: 1.5rem; font-size: 0.85rem; line-height: 1.8; color: var(--text-secondary); margin-bottom: 1rem;">
+                    <li>Download the Metasploitable 2 zip file from SourceForge or official security mirrors.</li>
+                    <li>Extract the contents (you will see a virtual disk file `.vmdk`).</li>
+                    <li>In VirtualBox, create a new VM. Choose Operating System: <code>Linux / Ubuntu (64-bit)</code>. Assign 1024MB RAM.</li>
+                    <li>At the "Hard Disk" prompt, select <strong>"Use an existing virtual hard disk file"</strong> and link the extracted <code>.vmdk</code> disk.</li>
+                    <li>Boot the machine. Default logins are: Username: <code>msfadmin</code> | Password: <code>msfadmin</code>.</li>
+                </ol>
+                <div class="alert-warning" style="margin-top: 0.5rem;">
+                    <div class="alert-title">⚠️ Safety Rule</div>
+                    <p style="font-size: 0.8rem; margin: 0; line-height: 1.4;">
+                        Metasploitable has no firewall rules or patches. Proceed to Step 5 immediately to ensure it remains restricted inside Host-Only networking.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 5: Network Config -->
+    <div class="accordion-item glass-panel" id="accordion-network">
+        <button class="accordion-trigger">
+            <span style="display: flex; align-items: center; gap: 1rem;">
+                <input type="checkbox" class="step-checkbox" id="check-network" onchange="syncCheck('setup_network')" {% if progress.setup_network %}checked{% endif %} onclick="event.stopPropagation();">
+                <span>Step 5: Network Adapters & Isolated Switched Configuration</span>
+            </span>
+            <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="accordion-content">
+            <div class="step-content">
+                <p style="font-size: 0.9rem; line-height: 1.6; color: var(--text-secondary); margin-bottom: 1rem;">
+                    We will configure the dual network interfaces: NAT (for downloading patches on attacker/host VMs) and Host-Only (which routes all VM scanning traffic safely).
+                </p>
+                
+                <h4 style="font-family: var(--font-heading); font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.5rem;">A. Create the Host-Only Adapter in VirtualBox:</h4>
+                <ol style="margin-left: 1.5rem; font-size: 0.85rem; line-height: 1.8; color: var(--text-secondary); margin-bottom: 1rem;">
+                    <li>Navigate to <strong>Tools</strong> (or File -> Tools) -> <strong>Network Manager</strong> (Host Network Manager).</li>
+                    <li>Click <strong>Create</strong>. It will establish a virtual adapter name (e.g. <code>VirtualBox Host-Only Ethernet Adapter</code>).</li>
+                    <li>Configure Adapter parameters: IP address: <code>192.168.56.1</code> | Subnet Mask: <code>255.255.255.0</code>.</li>
+                    <li>Enable the <strong>DHCP Server</strong> tab. Server IP: <code>192.168.56.100</code> | Address bounds: <code>192.168.56.101</code> to <code>192.168.56.254</code>.</li>
+                </ol>
+
+                <h4 style="font-family: var(--font-heading); font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.5rem;">B. Assign Adapters to VM Nodes:</h4>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 0.5rem; margin-bottom: 1rem; font-size: 0.85rem; line-height: 1.6;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--border-glass); text-align: left;">
+                            <th style="padding: 0.5rem 0;">Virtual Machine</th>
+                            <th style="padding: 0.5rem 0;">Adapter 1</th>
+                            <th style="padding: 0.5rem 0;">Adapter 2</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid var(--border-glass);">
+                            <td style="padding: 0.5rem 0; font-weight: 500;">Kali Linux</td>
+                            <td>NAT (Internet package downloads)</td>
+                            <td style="color: var(--accent-purple);">Host-Only (Auditing segment)</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-glass);">
+                            <td style="padding: 0.5rem 0; font-weight: 500;">Windows Target</td>
+                            <td>NAT (Updates/Defender feeds)</td>
+                            <td style="color: var(--accent-purple);">Host-Only (Isolated LAN)</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-glass);">
+                            <td style="padding: 0.5rem 0; font-weight: 500; color: #ff5252;">Metasploitable</td>
+                            <td style="color: var(--accent-purple);">Host-Only only (No internet)</td>
+                            <td style="color: var(--text-muted);">None (Disabled)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 6: Snapshots -->
+    <div class="accordion-item glass-panel" id="accordion-snapshots">
+        <button class="accordion-trigger">
+            <span style="display: flex; align-items: center; gap: 1rem;">
+                <input type="checkbox" class="step-checkbox" id="check-snapshots" onchange="syncCheck('setup_snapshots')" {% if progress.setup_snapshots %}checked{% endif %} onclick="event.stopPropagation();">
+                <span>Step 6: Snapshot Management & State Recovery</span>
+            </span>
+            <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="accordion-content">
+            <div class="step-content">
+                <p style="font-size: 0.9rem; line-height: 1.6; color: var(--text-secondary); margin-bottom: 1rem;">
+                    Running security labs often involves deploying configurations that modify OS registry flags or user directories. Setting clean snapshots lets you rollback changes instantly.
+                </p>
+                <h4 style="font-family: var(--font-heading); font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.5rem;">Snapshot Best Practices:</h4>
+                <ol style="margin-left: 1.5rem; font-size: 0.85rem; line-height: 1.8; color: var(--text-secondary); margin-bottom: 1rem;">
+                    <li>Shut down the target virtual machine (e.g., Metasploitable).</li>
+                    <li>Click the menu symbol next to the VM name in VirtualBox list and select <strong>Snapshots</strong> (or press Ctrl+T).</li>
+                    <li>Click <strong>Take</strong>. Name it: <code>Clean_Base_State</code>. Provide a description (e.g., "Initial import, network set to Host-Only").</li>
+                    <li>After practicing exercises, if you corrupt any services, shut down the VM, return to the Snapshots tab, click <code>Clean_Base_State</code>, and select <strong>Restore</strong>.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Synchronize check status dynamically with the Flask backend API
+    function syncCheck(itemKey) {
+        const checkbox = document.querySelector(`input[onchange="syncCheck('${itemKey}')"]`);
+        if (checkbox) {
+            toggleProgressItem(itemKey, checkbox.checked);
+        }
+    }
+    
+    // Auto-open accordion of completed/in-progress steps for convenient view
+    window.addEventListener('DOMContentLoaded', () => {
+        // Find first unchecked item to auto-expand it
+        const checkKeys = ['setup_vbox', 'setup_kali', 'setup_win', 'setup_meta', 'setup_network', 'setup_snapshots'];
+        const accordionMapping = {
+            'setup_vbox': 'accordion-vbox',
+            'setup_kali': 'accordion-kali',
+            'setup_win': 'accordion-win',
+            'setup_meta': 'accordion-meta',
+            'setup_network': 'accordion-network',
+            'setup_snapshots': 'accordion-snapshots'
+        };
+        
+        let foundUnchecked = false;
+        for (const key of checkKeys) {
+            const checkbox = document.querySelector(`input[onchange="syncCheck('${key}')"]`);
+            if (checkbox && !checkbox.checked) {
+                const element = document.getElementById(accordionMapping[key]);
+                if (element) {
+                    element.classList.add('open');
+                    foundUnchecked = true;
+                    break;
+                }
+            }
+        }
+        
+        // Default to first open if all are checked
+        if (!foundUnchecked) {
+            const first = document.querySelector('.accordion-item');
+            if (first) first.classList.add('open');
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Lab Journal Workspace{% endblock %}
+
+{% block content %}
+<div class="glass-panel" style="padding: 1.5rem 2rem; border-left: 4px solid var(--accent-purple); background: rgba(189, 0, 255, 0.01); margin-bottom: 1rem;" class="no-print">
+    <h2 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">Note-taking & Evidence Compiler</h2>
+    <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;">
+        Audit reports require thorough documentation. Record your target scanning logs, write down vulnerabilities, upload your Wireshark or Nmap screenshots, and print your report to PDF format.
+    </p>
+</div>
+
+<div class="notes-container">
+    <!-- Left Sidebar: Note List -->
+    <div class="notes-sidebar no-print">
+        <a href="{{ url_for('notes') }}" class="btn btn-primary" style="justify-content: center; width: 100%;">
+            <span>➕</span> New Journal Entry
+        </a>
+        
+        <div style="display: flex; flex-direction: column; gap: 0.5rem; overflow-y: auto; max-height: 500px; margin-top: 0.5rem;">
+            {% if all_notes %}
+                {% for note in all_notes %}
+                <a href="{{ url_for('notes', note_id=note.id) }}" class="note-item {% if selected_note and selected_note.id == note.id %}active{% endif %}">
+                    <div class="note-item-title">{{ note.title }}</div>
+                    <div class="note-item-date">Updated {{ note.updated_at.split(' ')[0] }} | 📷 {{ note.screenshot_count }}</div>
+                </a>
+                {% endfor %}
+            {% else %}
+                <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 2rem 0;">No logs created.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Right Pane: Active Editor -->
+    <div class="card glass-panel note-editor-wrapper">
+        <form action="{{ url_for('save_note') }}" method="POST" id="note-form" style="display: flex; flex-direction: column; gap: 1.5rem; flex-grow: 1;">
+            <input type="hidden" name="note_id" value="{% if selected_note %}{{ selected_note.id }}{% endif %}">
+            
+            <div>
+                <label style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.25rem;" class="no-print">Journal Title</label>
+                <input type="text" name="title" class="note-input-title" placeholder="e.g. Lab 2 Port Scan Audit" value="{% if selected_note %}{{ selected_note.title }}{% endif %}" required>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; flex-grow: 1;">
+                <label style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.25rem;" class="no-print">Notes & Command Logs (Markdown Supported)</label>
+                <textarea name="content" class="note-textarea" placeholder="Describe the steps, scan findings, and mitigation recommendations here..." style="flex-grow: 1; min-height: 320px;">{% if selected_note %}{{ selected_note.content }}{% endif %}</textarea>
+            </div>
+            
+            <!-- Toolbar buttons -->
+            <div class="note-toolbar">
+                <div style="display: flex; gap: 0.75rem;">
+                    <button type="submit" class="btn btn-primary">💾 Save Entry</button>
+                    {% if selected_note %}
+                    <button type="button" class="btn btn-secondary" onclick="exportPDF()">🖨️ Export PDF</button>
+                    {% endif %}
+                </div>
+                
+                {% if selected_note %}
+                <button type="button" class="btn btn-danger" onclick="deleteNote({{ selected_note.id }})">🗑️ Delete Entry</button>
+                {% endif %}
+            </div>
+        </form>
+        
+        <!-- Screenshots attachment management -->
+        {% if selected_note %}
+        <div style="border-top: 1px solid var(--border-glass); padding-top: 1.5rem; margin-top: 1rem;" class="no-print">
+            <h3 style="font-family: var(--font-heading); font-size: 1.1rem; margin-bottom: 0.75rem;">Attached Screenshots & Evidence</h3>
+            
+            <!-- Drag/drop file area -->
+            <div class="screenshot-upload-zone" onclick="document.getElementById('screenshot-input').click()">
+                <span>📷 Click here to select a Screenshot to upload</span>
+                <input type="file" id="screenshot-input" accept="image/*" style="display: none;" onchange="uploadScreenshot({{ selected_note.id }})">
+            </div>
+            
+            <div class="screenshot-gallery" id="s-gallery">
+                {% for screenshot in selected_note.screenshots %}
+                <div class="screenshot-thumb" id="s-thumb-{{ screenshot.id }}">
+                    <img src="{{ screenshot.file_path }}" alt="Lab screenshot evidence">
+                    <button class="screenshot-thumb-delete" onclick="removeScreenshot({{ screenshot.id }})" title="Remove screenshot">✕</button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Print preview section of screenshots -->
+        <div class="print-only" style="display: none; margin-top: 2rem;">
+            <h3>Attached Evidence:</h3>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1rem;">
+                {% for screenshot in selected_note.screenshots %}
+                <div style="border: 1px solid #ccc; padding: 0.5rem; border-radius: 4px; page-break-inside: avoid;">
+                    <img src="{{ screenshot.file_path }}" style="width: 100%; height: auto;" alt="Screenshot">
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="alert-note no-print" style="margin-top: 1rem;">
+            <div class="alert-title">💡 Save Note First</div>
+            <p style="font-size: 0.8rem; margin: 0;">Save your note to enable evidence screenshot uploads and PDF exports.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function deleteNote(noteId) {
+        if (confirm("Are you sure you want to delete this journal entry? This will permanently remove all associated screenshots.")) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/notes/delete/${noteId}`;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+
+    async function uploadScreenshot(noteId) {
+        const fileInput = document.getElementById('screenshot-input');
+        if (fileInput.files.length === 0) return;
+        
+        const formData = new FormData();
+        formData.append('screenshot', fileInput.files[0]);
+        
+        try {
+            showToast("Uploading evidence image...");
+            const response = await fetch(`/notes/upload-screenshot/${noteId}`, {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to upload image.');
+            }
+            
+            const data = await response.json();
+            if (data.success) {
+                // Instantly update gallery in view
+                const gallery = document.getElementById('s-gallery');
+                
+                // We reload page to ensure database bindings sync cleanly, or build DOM
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error('Upload error:', error);
+            showToast("Failed to upload screenshot image", "error");
+        }
+    }
+
+    async function removeScreenshot(screenshotId) {
+        if (confirm("Remove this screenshot?")) {
+            try {
+                const response = await fetch(`/notes/delete-screenshot/${screenshotId}`, {
+                    method: 'POST'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to delete screenshot.');
+                }
+                
+                const data = await response.json();
+                if (data.success) {
+                    const thumb = document.getElementById(`s-thumb-${screenshotId}`);
+                    if (thumb) thumb.remove();
+                    showToast("Screenshot deleted.");
+                }
+            } catch (error) {
+                console.error('Delete error:', error);
+                showToast("Failed to delete image", "error");
+            }
+        }
+    }
+
+    function exportPDF() {
+        showToast("Opening system print prompt...");
+        // Delay slightly to allow the toast to pop and hide elements
+        setTimeout(() => {
+            window.print();
+        }, 500);
+    }
+</script>
+<style>
+    /* CSS hacks to adjust print behaviors */
+    @media screen {
+        .print-only {
+            display: none !important;
+        }
+    }
+    @media print {
+        .no-print {
+            display: none !important;
+        }
+        .print-only {
+            display: block !important;
+        }
+        .note-editor-wrapper {
+            border: none !important;
+            box-shadow: none !important;
+            background: transparent !important;
+            padding: 0 !important;
+        }
+        .note-textarea {
+            border: none !important;
+            background: transparent !important;
+            color: #000 !important;
+            font-size: 11pt !important;
+            line-height: 1.5 !important;
+            resize: none !important;
+            height: auto !important;
+        }
+    }
+</style>
+{% endblock %}

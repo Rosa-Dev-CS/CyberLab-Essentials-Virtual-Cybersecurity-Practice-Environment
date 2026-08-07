@@ -1,0 +1,354 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Guided Practice Labs{% endblock %}
+
+{% block content %}
+<div class="glass-panel" style="padding: 1.5rem 2rem; border-left: 4px solid var(--accent-green); background: rgba(0, 230, 118, 0.01); margin-bottom: 1rem;">
+    <h2 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">Practical Training Exercises</h2>
+    <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;">
+        Apply your knowledge in your local hypervisor. Review tasks below, perform commands in your virtual lab, answer the verification checks, and auto-draft lab reports directly into your journal.
+    </p>
+</div>
+
+<!-- Labs List -->
+<div class="accordion accordion-exclusive">
+    <!-- Lab 1: Discover devices -->
+    <div class="accordion-item glass-panel open" id="lab-card-discovery">
+        <button class="accordion-trigger">
+            <span style="display: flex; align-items: center; gap: 0.75rem;">
+                <span class="lab-status-badge {% if progress.lab_discovery %}completed{% else %}pending{% endif %}" id="badge-lab_discovery">
+                    {% if progress.lab_discovery %}Passed{% else %}In Progress{% endif %}
+                </span>
+                <span>Lab 1: Host Discovery on Virtual Subnet</span>
+            </span>
+            <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="accordion-content">
+            <div class="lab-card">
+                <h4 style="font-family: var(--font-heading); color: var(--accent-cyan); margin-bottom: 0.5rem;">Objective:</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+                    Boot your Kali Linux VM and Metasploitable VM. Perform an active ping sweep on your Host-Only subnet using Nmap to identify the IP address of your Metasploitable target.
+                </p>
+                <div style="font-size: 0.8rem; background: rgba(0,0,0,0.2); padding: 0.75rem; border-radius: 6px; border: 1px solid var(--border-glass); font-family: var(--font-mono); margin-bottom: 1rem; color: var(--accent-orange);">
+                    $ nmap -sn 192.168.56.0/24
+                </div>
+
+                <div style="border-top: 1px solid var(--border-glass); padding-top: 1rem; margin-top: 1rem;">
+                    <label style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.5rem; font-weight: 600;">Verification: What is the default subnet mask for the 192.168.56.0/24 Host-Only Network?</label>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <select id="verify-l1" class="glossary-search-input" style="max-width: 250px; background: #0f111a; color: var(--text-primary);">
+                            <option value="">-- Select Answer --</option>
+                            <option value="A">255.0.0.0 (Class A)</option>
+                            <option value="B">255.255.0.0 (Class B)</option>
+                            <option value="C">255.255.255.0 (Class C)</option>
+                        </select>
+                        <button class="lab-action-btn" onclick="validateLab1()">Verify Answer</button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+                    <button class="btn btn-secondary" onclick="draftLabJournal(1)">📝 Draft Notes in Journal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lab 2: Port Scanning -->
+    <div class="accordion-item glass-panel" id="lab-card-ports">
+        <button class="accordion-trigger">
+            <span style="display: flex; align-items: center; gap: 0.75rem;">
+                <span class="lab-status-badge {% if progress.lab_ports %}completed{% else %}pending{% endif %}" id="badge-lab_ports">
+                    {% if progress.lab_ports %}Passed{% else %}In Progress{% endif %}
+                </span>
+                <span>Lab 2: Service Enumeration and Port Mapping</span>
+            </span>
+            <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="accordion-content">
+            <div class="lab-card">
+                <h4 style="font-family: var(--font-heading); color: var(--accent-cyan); margin-bottom: 0.5rem;">Objective:</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+                    Run a detailed service scan against the Metasploitable VM to enumerate running services, server software versions, and open system daemon sockets.
+                </p>
+                <div style="font-size: 0.8rem; background: rgba(0,0,0,0.2); padding: 0.75rem; border-radius: 6px; border: 1px solid var(--border-glass); font-family: var(--font-mono); margin-bottom: 1rem; color: var(--accent-orange);">
+                    $ nmap -sS -sV 192.168.56.103
+                </div>
+
+                <div style="border-top: 1px solid var(--border-glass); padding-top: 1rem; margin-top: 1rem;">
+                    <label style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.5rem; font-weight: 600;">Verification: Which file transfer protocol (FTP) daemon is listening on port 21 of Metasploitable?</label>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <input type="text" id="verify-l2" class="glossary-search-input" placeholder="e.g. vsftpd 2.3.4" style="max-width: 250px;">
+                        <button class="lab-action-btn" onclick="validateLab2()">Verify Answer</button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+                    <button class="btn btn-secondary" onclick="draftLabJournal(2)">📝 Draft Notes in Journal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lab 3: Packet Sniffing -->
+    <div class="accordion-item glass-panel" id="lab-card-wireshark">
+        <button class="accordion-trigger">
+            <span style="display: flex; align-items: center; gap: 0.75rem;">
+                <span class="lab-status-badge {% if progress.lab_wireshark %}completed{% else %}pending{% endif %}" id="badge-lab_wireshark">
+                    {% if progress.lab_wireshark %}Passed{% else %}In Progress{% endif %}
+                </span>
+                <span>Lab 3: Capture Traffic with Wireshark</span>
+            </span>
+            <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="accordion-content">
+            <div class="lab-card">
+                <h4 style="font-family: var(--font-heading); color: var(--accent-cyan); margin-bottom: 0.5rem;">Objective:</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+                    Launch Wireshark on Kali Linux, listen on the Host-Only interface (<code>eth1</code>), and perform a simple telnet login connection to Metasploitable. Stop the capture and analyze the raw telnet stream contents to see how cleartext protocols leak data.
+                </p>
+                <div style="font-size: 0.8rem; background: rgba(0,0,0,0.2); padding: 0.75rem; border-radius: 6px; border: 1px solid var(--border-glass); font-family: var(--font-mono); margin-bottom: 1rem; color: var(--accent-orange);">
+                    $ telnet 192.168.56.103
+                </div>
+
+                <div style="border-top: 1px solid var(--border-glass); padding-top: 1rem; margin-top: 1rem;">
+                    <label style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.5rem; font-weight: 600;">Verification: Are passwords encrypted or plain-text in raw Telnet TCP packet payloads?</label>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <select id="verify-l3" class="glossary-search-input" style="max-width: 250px; background: #0f111a; color: var(--text-primary);">
+                            <option value="">-- Select Answer --</option>
+                            <option value="enc">Encrypted (SSH-style)</option>
+                            <option value="plain">Plain-text (readable)</option>
+                        </select>
+                        <button class="lab-action-btn" onclick="validateLab3()">Verify Answer</button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+                    <button class="btn btn-secondary" onclick="draftLabJournal(3)">📝 Draft Notes in Journal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lab 4: Vulnerable App -->
+    <div class="accordion-item glass-panel" id="lab-card-vulnweb">
+        <button class="accordion-trigger">
+            <span style="display: flex; align-items: center; gap: 0.75rem;">
+                <span class="lab-status-badge {% if progress.lab_vulnweb %}completed{% else %}pending{% endif %}" id="badge-lab_vulnweb">
+                    {% if progress.lab_vulnweb %}Passed{% else %}In Progress{% endif %}
+                </span>
+                <span>Lab 4: Browse Vulnerable Web Applications</span>
+            </span>
+            <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="accordion-content">
+            <div class="lab-card">
+                <h4 style="font-family: var(--font-heading); color: var(--accent-cyan); margin-bottom: 0.5rem;">Objective:</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+                    Metasploitable hosts several web utilities. Open a browser in Kali, navigate to <code>http://192.168.56.103/mutillidae</code> or <code>http://192.168.56.103/dvwa</code> and explore their structures defensively.
+                </p>
+
+                <div style="border-top: 1px solid var(--border-glass); padding-top: 1rem; margin-top: 1rem;">
+                    <label style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.5rem; font-weight: 600;">Verification: What does DVWA stand for?</label>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <input type="text" id="verify-l4" class="glossary-search-input" placeholder="e.g. Damn Vulnerable..." style="max-width: 320px;">
+                        <button class="lab-action-btn" onclick="validateLab4()">Verify Answer</button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+                    <button class="btn btn-secondary" onclick="draftLabJournal(4)">📝 Draft Notes in Journal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lab 5: Linux Admin -->
+    <div class="accordion-item glass-panel" id="lab-card-linux_admin">
+        <button class="accordion-trigger">
+            <span style="display: flex; align-items: center; gap: 0.75rem;">
+                <span class="lab-status-badge {% if progress.lab_linux_admin %}completed{% else %}pending{% endif %}" id="badge-lab_linux_admin">
+                    {% if progress.lab_linux_admin %}Passed{% else %}In Progress{% endif %}
+                </span>
+                <span>Lab 5: Linux Auditing and Privilege Checks</span>
+            </span>
+            <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="accordion-content">
+            <div class="lab-card">
+                <h4 style="font-family: var(--font-heading); color: var(--accent-cyan); margin-bottom: 0.5rem;">Objective:</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+                    Inspect the target's configuration files to audit weak permissions. Find files writable by standard users or set to world-write permissions (`chmod 777`).
+                </p>
+
+                <div style="border-top: 1px solid var(--border-glass); padding-top: 1rem; margin-top: 1rem;">
+                    <label style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.5rem; font-weight: 600;">Verification: Which Unix file is responsible for mapping usernames to passwords (hashes)?</label>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <input type="text" id="verify-l5" class="glossary-search-input" placeholder="e.g. /etc/..." style="max-width: 250px;">
+                        <button class="lab-action-btn" onclick="validateLab5()">Verify Answer</button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+                    <button class="btn btn-secondary" onclick="draftLabJournal(5)">📝 Draft Notes in Journal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lab 6: Documentation -->
+    <div class="accordion-item glass-panel" id="lab-card-docs">
+        <button class="accordion-trigger">
+            <span style="display: flex; align-items: center; gap: 0.75rem;">
+                <span class="lab-status-badge {% if progress.lab_docs %}completed{% else %}pending{% endif %}" id="badge-lab_docs">
+                    {% if progress.lab_docs %}Passed{% else %}In Progress{% endif %}
+                </span>
+                <span>Lab 6: Document Findings and Safe Practice Reporting</span>
+            </span>
+            <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="accordion-content">
+            <div class="lab-card">
+                <h4 style="font-family: var(--font-heading); color: var(--accent-cyan); margin-bottom: 0.5rem;">Objective:</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+                    Open your Lab Journal and compile your notes. Review your discovery findings, upload screenshots showing open ports, structure your mitigation advice, and export the file as a PDF report.
+                </p>
+
+                <div style="border-top: 1px solid var(--border-glass); padding-top: 1rem; margin-top: 1rem;">
+                    <label style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.5rem; font-weight: 600;">Verification: What is the main objective of a security report?</label>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <select id="verify-l6" class="glossary-search-input" style="max-width: 320px; background: #0f111a; color: var(--text-primary);">
+                            <option value="">-- Select Answer --</option>
+                            <option value="A">To show off hacking skills</option>
+                            <option value="B">To recommend defensive remediation & patch fixes</option>
+                            <option value="C">To automate attacks against external servers</option>
+                        </select>
+                        <button class="lab-action-btn" onclick="validateLab6()">Verify Answer</button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+                    <a href="{{ url_for('notes') }}" class="btn btn-primary">📓 Go to Lab Journal</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Lab templates content to auto-populate journal
+    const labReportTemplates = {
+        1: {
+            title: "Lab 1: Host Discovery Log",
+            content: "# Lab 1 Discovery Log\n\n**Date:** " + new Date().toLocaleDateString() + "\n**Subnet Swept:** 192.168.56.0/24\n\n### Commands Run:\n`nmap -sn 192.168.56.0/24`\n\n### Findings:\n- Attacker IP (Kali): 192.168.56.101\n- Gateway IP (Host): 192.168.56.1\n- Metasploitable target IP found: 192.168.56.103\n\n### Discussion:\nping sweeps provide quick inventory checks. Keeping scanning targets locked inside host-only boundaries ensures local networks remain unaffected."
+        },
+        2: {
+            title: "Lab 2: Port Scanning Audit",
+            content: "# Lab 2 Service Audit\n\n**Target IP:** 192.168.56.103\n\n### Commands Run:\n`nmap -sS -sV 192.168.56.103`\n\n### Discovered Open Services:\n- Port 21: FTP (vsftpd 2.3.4)\n- Port 22: SSH (OpenSSH 4.7p1)\n- Port 80: HTTP (Apache 2.2.8)\n\n### Mitigation Advice:\nServices like FTP and Telnet transmit credentials in cleartext. Disable unused ports and enforce encrypted shell links (SSH) using strong authentication key configurations."
+        },
+        3: {
+            title: "Lab 3: Wireshark Flow Log",
+            content: "# Lab 3 Wireshark Captures\n\n**Interface Captured:** eth1 (Host-Only virtual bridge)\n\n### Observed Protocols:\n- Telnet TCP handshakes\n- CLEAR-TEXT Username & password transmission\n\n### Packet Telemetry Summary:\nCapturing raw Telnet frames reveals that plaintext authentication payloads can be read in transit. Implement SSL/TLS or SSH wrappers for all administrative channels."
+        },
+        4: {
+            title: "Lab 4: Web Application Audit",
+            content: "# Lab 4 Web App Scan\n\n**URL Tested:** http://192.168.56.103/dvwa\n\n### Findings:\n- Intentionally vulnerable inputs (SQL injection, XSS) exposed.\n\n### Recommendation:\nApply parameter binding in database statements to eliminate SQL injection vectors. Sanitize all user inputs before printing to browser views."
+        },
+        5: {
+            title: "Lab 5: Linux Access Control Log",
+            content: "# Lab 5 Privileges Audit\n\n### Checked Directories:\n- /etc/passwd\n- /etc/shadow\n\n### Remediation Action:\nStandard user configurations should restrict write permissions to password directories. shadow databases must be set to read-only for root accounts solely (`chmod 400`)."
+        }
+    };
+
+    function validateLab1() {
+        const val = document.getElementById('verify-l1').value;
+        if (val === 'C') {
+            markLabPassed('lab_discovery');
+        } else {
+            showToast("Incorrect answer. Please review CIDR masks.", "error");
+        }
+    }
+
+    function validateLab2() {
+        const val = document.getElementById('verify-l2').value.trim().toLowerCase();
+        if (val.includes('vsftpd')) {
+            markLabPassed('lab_ports');
+        } else {
+            showToast("Incorrect service. Hint: Nmap output shows vsftpd.", "error");
+        }
+    }
+
+    function validateLab3() {
+        const val = document.getElementById('verify-l3').value;
+        if (val === 'plain') {
+            markLabPassed('lab_wireshark');
+        } else {
+            showToast("Incorrect. Recheck packet dump stream details.", "error");
+        }
+    }
+
+    function validateLab4() {
+        const val = document.getElementById('verify-l4').value.trim().toLowerCase();
+        if (val.includes('damn vulnerable')) {
+            markLabPassed('lab_vulnweb');
+        } else {
+            showToast("Incorrect. Check DVWA abbreviation meaning.", "error");
+        }
+    }
+
+    function validateLab5() {
+        const val = document.getElementById('verify-l5').value.trim().toLowerCase();
+        if (val.includes('/etc/shadow')) {
+            markLabPassed('lab_linux_admin');
+        } else {
+            showToast("Incorrect. Think of where shadow passwords live.", "error");
+        }
+    }
+
+    function validateLab6() {
+        const val = document.getElementById('verify-l6').value;
+        if (val === 'B') {
+            markLabPassed('lab_docs');
+        } else {
+            showToast("Incorrect. Reports are meant for remediation advice.", "error");
+        }
+    }
+
+    function markLabPassed(key) {
+        const badge = document.getElementById(`badge-${key}`);
+        if (badge) {
+            badge.className = "lab-status-badge completed";
+            badge.textContent = "Passed";
+        }
+        toggleProgressItem(key, true);
+        showToast("Vulnerability checkpoint cleared successfully!");
+    }
+
+    // Auto-draft report templates via local form submission
+    function draftLabJournal(labId) {
+        const template = labReportTemplates[labId];
+        if (!template) return;
+
+        // We create a temporary form to POST to the journal creation route
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/notes/save';
+
+        const titleInput = document.createElement('input');
+        titleInput.type = 'hidden';
+        titleInput.name = 'title';
+        titleInput.value = template.title;
+
+        const contentInput = document.createElement('input');
+        contentInput.type = 'hidden';
+        contentInput.name = 'content';
+        contentInput.value = template.content;
+
+        form.appendChild(titleInput);
+        form.appendChild(contentInput);
+        document.body.appendChild(form);
+        form.submit();
+    }
+</script>
+{% endblock %}

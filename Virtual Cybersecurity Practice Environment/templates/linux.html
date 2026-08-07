@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Linux Learning Center{% endblock %}
+
+{% block content %}
+<div class="glass-panel" style="padding: 1.5rem 2rem; border-left: 4px solid var(--accent-orange); background: rgba(255, 145, 0, 0.01); margin-bottom: 1rem;">
+    <h2 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">Interactive Command Shell Simulator</h2>
+    <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;">
+        Operating security VMs (such as Kali Linux) relies heavily on command-line mastery. Browse commands by category on the left, click one to load its details, and run it in the emulator to observe expected terminal output.
+    </p>
+</div>
+
+<div class="cli-container">
+    <!-- Sidebar: Commands list -->
+    <div class="card glass-panel cli-list">
+        <!-- File Management -->
+        <div class="cli-category-header">File & Directory Management</div>
+        <div class="cli-card active" data-cmd-id="ls">
+            <span class="cli-cmd">ls -la</span>
+            <div class="cli-desc">List files detailing sizes and hidden elements.</div>
+        </div>
+        <div class="cli-card" data-cmd-id="pwd">
+            <span class="cli-cmd">pwd</span>
+            <div class="cli-desc">Output current working directory path.</div>
+        </div>
+        <div class="cli-card" data-cmd-id="cat">
+            <span class="cli-cmd">cat /etc/passwd</span>
+            <div class="cli-desc">View local user account mappings.</div>
+        </div>
+        <div class="cli-card" data-cmd-id="mkdir">
+            <span class="cli-cmd">mkdir -p /tmp/cyber_lab</span>
+            <div class="cli-desc">Create a new workspace directory structure.</div>
+        </div>
+
+        <!-- User Management -->
+        <div class="cli-category-header">User & Access Management</div>
+        <div class="cli-card" data-cmd-id="whoami">
+            <span class="cli-cmd">whoami</span>
+            <div class="cli-desc">Identify the current active shell user.</div>
+        </div>
+        <div class="cli-card" data-cmd-id="id">
+            <span class="cli-cmd">id</span>
+            <div class="cli-desc">Display user and primary group IDs.</div>
+        </div>
+        <div class="cli-card" data-cmd-id="useradd">
+            <span class="cli-cmd">sudo useradd -m analyst</span>
+            <div class="cli-desc">Create a new system user profile.</div>
+        </div>
+
+        <!-- Permissions -->
+        <div class="cli-category-header">File Permissions</div>
+        <div class="cli-card" data-cmd-id="chmod">
+            <span class="cli-cmd">chmod +x backup.sh</span>
+            <div class="cli-desc">Mark a script file as executable.</div>
+        </div>
+        <div class="cli-card" data-cmd-id="chown">
+            <span class="cli-cmd">sudo chown root:root file.txt</span>
+            <div class="cli-desc">Change file owner and group to root.</div>
+        </div>
+
+        <!-- Process Management -->
+        <div class="cli-category-header">Process Management</div>
+        <div class="cli-card" data-cmd-id="ps">
+            <span class="cli-cmd">ps aux | grep apache</span>
+            <div class="cli-desc">Find Apache server processes.</div>
+        </div>
+        <div class="cli-card" data-cmd-id="kill">
+            <span class="cli-cmd">sudo kill -9 1402</span>
+            <div class="cli-desc">Force terminate a process using PID.</div>
+        </div>
+
+        <!-- Networking -->
+        <div class="cli-category-header">Network Administration</div>
+        <div class="cli-card" data-cmd-id="ipa">
+            <span class="cli-cmd">ip a</span>
+            <div class="cli-desc">Inspect network interfaces and IP addresses.</div>
+        </div>
+        <div class="cli-card" data-cmd-id="ping">
+            <span class="cli-cmd">ping -c 3 192.168.56.103</span>
+            <div class="cli-desc">Check target network reachability.</div>
+        </div>
+        <div class="cli-card" data-cmd-id="ss">
+            <span class="cli-cmd">ss -antp</span>
+            <div class="cli-desc">List listening ports and connections.</div>
+        </div>
+
+        <!-- Package Management -->
+        <div class="cli-category-header">Package Management</div>
+        <div class="cli-card" data-cmd-id="aptupdate">
+            <span class="cli-cmd">sudo apt update</span>
+            <div class="cli-desc">Update list of available app packages.</div>
+        </div>
+        <div class="cli-card" data-cmd-id="aptinstall">
+            <span class="cli-cmd">sudo apt install nmap -y</span>
+            <div class="cli-desc">Install network mapping utility.</div>
+        </div>
+    </div>
+
+    <!-- Console Terminal Emulator -->
+    <div class="cli-console-wrapper">
+        <div class="cli-console-header">
+            <div class="cli-console-dots">
+                <div class="cli-console-dot"></div>
+                <div class="cli-console-dot"></div>
+                <div class="cli-console-dot"></div>
+            </div>
+            <div class="cli-console-title">bash - labuser@kali: ~</div>
+            <div style="width: 40px;"></div>
+        </div>
+        <div class="cli-console-body" id="console-body">
+            <div># Linux Shell Simulator Initialized.</div>
+            <div># Select a command card to begin training.</div>
+            <br>
+            <div id="terminal-history"></div>
+            <div id="terminal-current-line" style="display: flex;">
+                <span class="terminal-prompt" id="term-prompt">kali@sec-lab:~$ &nbsp;</span>
+                <span class="terminal-input" id="term-input"></span>
+            </div>
+        </div>
+        
+        <!-- Run controls -->
+        <div class="card glass-panel" style="margin-top: 1rem; padding: 1rem 1.5rem; flex-direction: row; align-items: center; justify-content: space-between; gap: 1rem;">
+            <div>
+                <span style="font-size: 0.75rem; color: var(--text-muted); display: block; text-transform: uppercase; font-family: var(--font-mono);">Active Syntax</span>
+                <code id="syntax-display" style="color: var(--accent-orange); font-size: 1.1rem; font-family: var(--font-mono); font-weight: bold;">ls -la</code>
+            </div>
+            <button class="cli-run-btn" id="run-btn">Execute Command</button>
+        </div>
+    </div>
+</div>
+
+<!-- Checklist tracker sync for Linux Learning completion -->
+<div class="card glass-panel" style="margin-top: 2rem; padding: 2rem;">
+    <h3 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">Linux Command Checkpoints</h3>
+    <div class="grid-container" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+        <label class="step-card" style="cursor: pointer;">
+            <input type="checkbox" class="step-checkbox" id="check-linux-file" onchange="syncCheck('linux_file_mgmt')" {% if progress.linux_file_mgmt %}checked{% endif %}>
+            <div class="step-content">
+                <div class="step-title">File Operations</div>
+                <div class="step-desc">Reviewed ls, pwd, cat, mkdir.</div>
+            </div>
+        </label>
+        <label class="step-card" style="cursor: pointer;">
+            <input type="checkbox" class="step-checkbox" id="check-linux-user" onchange="syncCheck('linux_user_mgmt')" {% if progress.linux_user_mgmt %}checked{% endif %}>
+            <div class="step-content">
+                <div class="step-title">User Account Admin</div>
+                <div class="step-desc">Reviewed whoami, id, useradd.</div>
+            </div>
+        </label>
+        <label class="step-card" style="cursor: pointer;">
+            <input type="checkbox" class="step-checkbox" id="check-linux-perms" onchange="syncCheck('linux_perms')" {% if progress.linux_perms %}checked{% endif %}>
+            <div class="step-content">
+                <div class="step-title">Access Permissions</div>
+                <div class="step-desc">Reviewed chmod and chown.</div>
+            </div>
+        </label>
+        <label class="step-card" style="cursor: pointer;">
+            <input type="checkbox" class="step-checkbox" id="check-linux-proc" onchange="syncCheck('linux_proc_mgmt')" {% if progress.linux_proc_mgmt %}checked{% endif %}>
+            <div class="step-content">
+                <div class="step-title">Processes & Services</div>
+                <div class="step-desc">Reviewed ps aux and kill.</div>
+            </div>
+        </label>
+        <label class="step-card" style="cursor: pointer;">
+            <input type="checkbox" class="step-checkbox" id="check-linux-net" onchange="syncCheck('linux_network_cmd')" {% if progress.linux_network_cmd %}checked{% endif %}>
+            <div class="step-content">
+                <div class="step-title">Network Commands</div>
+                <div class="step-desc">Reviewed ip a, ping, ss.</div>
+            </div>
+        </label>
+        <label class="step-card" style="cursor: pointer;">
+            <input type="checkbox" class="step-checkbox" id="check-linux-pkg" onchange="syncCheck('linux_pkg_mgmt')" {% if progress.linux_pkg_mgmt %}checked{% endif %}>
+            <div class="step-content">
+                <div class="step-title">Apt Packages</div>
+                <div class="step-desc">Reviewed apt update & install.</div>
+            </div>
+        </label>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/shell.js') }}"></script>
+<script>
+    function syncCheck(itemKey) {
+        const checkbox = document.getElementById(`check-${itemKey.replace('_', '-')}`);
+        // Note: replace all is safer, wait, let's just make id unique:
+        let chk = null;
+        if(itemKey === 'linux_file_mgmt') chk = document.getElementById('check-linux-file');
+        if(itemKey === 'linux_user_mgmt') chk = document.getElementById('check-linux-user');
+        if(itemKey === 'linux_perms') chk = document.getElementById('check-linux-perms');
+        if(itemKey === 'linux_proc_mgmt') chk = document.getElementById('check-linux-proc');
+        if(itemKey === 'linux_network_cmd') chk = document.getElementById('check-linux-net');
+        if(itemKey === 'linux_pkg_mgmt') chk = document.getElementById('check-linux-pkg');
+        
+        if (chk) {
+            toggleProgressItem(itemKey, chk.checked);
+        }
+    }
+</script>
+{% endblock %}

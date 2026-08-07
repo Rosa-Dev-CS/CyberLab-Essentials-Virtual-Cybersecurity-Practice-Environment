@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Lab Network Architecture{% endblock %}
+
+{% block content %}
+<div class="glass-panel" style="padding: 1.5rem 2rem; border-left: 4px solid var(--accent-cyan); background: rgba(0, 240, 255, 0.01);">
+    <h2 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">Interactive Topology & Isolation Model</h2>
+    <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;">
+        Understanding network traffic flow is essential for cybersecurity testing. This interactive model illustrates the isolation boundary between your local system and the guest virtual machines. <strong>Click on any component</strong> in the diagram to inspect its interfaces, roles, and settings.
+    </p>
+</div>
+
+<!-- Interactive Network Topology Layout -->
+<div class="topology-container">
+    <!-- SVG Panel -->
+    <div class="card glass-panel topology-viewer">
+        <svg class="topology-svg" viewBox="0 0 700 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Definitions for filters and marker arrows -->
+            <defs>
+                <filter id="glow-cyan" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="6" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+                <filter id="glow-purple" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="6" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+                <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b" />
+                </marker>
+            </defs>
+
+            <!-- Network Adapters/Buses -->
+            <!-- NAT Network Bus -->
+            <rect x="100" y="160" width="500" height="6" rx="3" fill="#00f0ff" opacity="0.3" filter="url(#glow-cyan)"/>
+            <text x="350" y="150" fill="var(--accent-cyan)" font-family="var(--font-mono)" font-size="11" text-anchor="middle" letter-spacing="1">NAT INTERNET GATEWAY (10.0.2.0/24)</text>
+
+            <!-- Host-Only Network Bus -->
+            <rect x="100" y="340" width="500" height="6" rx="3" fill="#bd00ff" opacity="0.3" filter="url(#glow-purple)"/>
+            <text x="350" y="365" fill="var(--accent-purple)" font-family="var(--font-mono)" font-size="11" text-anchor="middle" letter-spacing="1">ISOLATED HOST-ONLY LAN (192.168.56.0/24)</text>
+
+            <!-- Connections - Host to Host-Only Bus -->
+            <line x1="150" y1="230" x2="150" y2="340" stroke="#64748b" stroke-width="2" stroke-dasharray="4,4"/>
+            <!-- Connections - Kali Linux to NAT and Host-Only -->
+            <line x1="300" y1="230" x2="300" y2="166" stroke="#00f0ff" stroke-width="2" class="network-line"/>
+            <line x1="300" y1="230" x2="300" y2="340" stroke="#bd00ff" stroke-width="2" class="network-line"/>
+            <!-- Connections - Windows to NAT and Host-Only -->
+            <line x1="450" y1="230" x2="450" y2="166" stroke="#00f0ff" stroke-width="2" class="network-line"/>
+            <line x1="450" y1="230" x2="450" y2="340" stroke="#bd00ff" stroke-width="2" class="network-line"/>
+            <!-- Connections - Metasploitable to Host-Only ONLY (Isolated!) -->
+            <line x1="600" y1="230" x2="600" y2="340" stroke="#bd00ff" stroke-width="2" class="network-line"/>
+            <line x1="600" y1="166" x2="600" y2="230" stroke="#ef4444" stroke-width="2" stroke-dasharray="2,4" />
+            <path d="M 590 190 L 610 210 M 610 190 L 590 210" stroke="#ef4444" stroke-width="2.5" />
+
+            <!-- Connection Host Computer to Hypervisor/NAT Network -->
+            <line x1="150" y1="230" x2="150" y2="90" stroke="#64748b" stroke-width="2"/>
+            <line x1="150" y1="90" x2="350" y2="90" stroke="#64748b" stroke-width="2"/>
+            <line x1="350" y1="90" x2="350" y2="160" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+            <!-- Node 1: Host Computer -->
+            <g class="node" id="node-host" onclick="selectNode('host')">
+                <rect class="node-bg" x="90" y="210" width="120" height="50" rx="8" fill="rgba(25, 28, 41, 0.9)" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+                <text class="node-text" x="150" y="240">Host Machine</text>
+                <text x="150" y="252" fill="var(--text-muted)" font-family="var(--font-body)" font-size="9" text-anchor="middle">Physical OS</text>
+            </g>
+
+            <!-- Node 2: Kali Linux (Attacker VM) -->
+            <g class="node" id="node-kali" onclick="selectNode('kali')">
+                <rect class="node-bg" x="240" y="210" width="120" height="50" rx="8" fill="rgba(25, 28, 41, 0.9)" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+                <text class="node-text" x="300" y="240">Kali Linux VM</text>
+                <text x="300" y="252" fill="var(--accent-cyan)" font-family="var(--font-mono)" font-size="9" font-weight="600" text-anchor="middle">192.168.56.101</text>
+            </g>
+
+            <!-- Node 3: Windows Lab VM (Target/Auditee) -->
+            <g class="node" id="node-windows" onclick="selectNode('windows')">
+                <rect class="node-bg" x="390" y="210" width="120" height="50" rx="8" fill="rgba(25, 28, 41, 0.9)" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+                <text class="node-text" x="450" y="240">Windows VM</text>
+                <text x="450" y="252" fill="var(--text-secondary)" font-family="var(--font-mono)" font-size="9" text-anchor="middle">192.168.56.102</text>
+            </g>
+
+            <!-- Node 4: Metasploitable VM (Vulnerable Target) -->
+            <g class="node" id="node-metasploitable" onclick="selectNode('metasploitable')">
+                <rect class="node-bg" x="540" y="210" width="120" height="50" rx="8" fill="rgba(25, 28, 41, 0.9)" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+                <text class="node-text" x="600" y="240">Metasploitable</text>
+                <text x="600" y="252" fill="var(--accent-purple)" font-family="var(--font-mono)" font-size="9" font-weight="600" text-anchor="middle">192.168.56.103</text>
+            </g>
+
+            <!-- Labels for interface connections (Virtual adapters) -->
+            <circle cx="300" cy="163" r="4" fill="var(--accent-cyan)" />
+            <circle cx="450" cy="163" r="4" fill="var(--accent-cyan)" />
+            
+            <circle cx="150" cy="343" r="4" fill="var(--accent-purple)" />
+            <circle cx="300" cy="343" r="4" fill="var(--accent-purple)" />
+            <circle cx="450" cy="343" r="4" fill="var(--accent-purple)" />
+            <circle cx="600" cy="343" r="4" fill="var(--accent-purple)" />
+        </svg>
+    </div>
+
+    <!-- Details Display Panel -->
+    <div class="card glass-panel topology-details" id="details-panel">
+        <div style="text-align: center; margin: auto 0;" id="details-default">
+            <span style="font-size: 2.5rem;">🖱️</span>
+            <h3 style="font-family: var(--font-heading); margin-top: 0.5rem; font-size: 1.1rem;">Select a Node</h3>
+            <p style="color: var(--text-secondary); font-size: 0.85rem;">Click on any machine or component in the network diagram to view technical parameters and configuration data.</p>
+        </div>
+
+        <div style="display: none;" id="details-active">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                <h3 class="page-title" id="detail-name" style="font-size: 1.4rem;">Machine Name</h3>
+                <span class="tech-tag" id="detail-role">Attacker</span>
+            </div>
+            
+            <table style="width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.85rem; line-height: 1.8;">
+                <tbody>
+                    <tr style="border-bottom: 1px solid var(--border-glass);">
+                        <td style="color: var(--text-muted); padding: 0.5rem 0; width: 40%;">Operating System</td>
+                        <td style="font-weight: 500;" id="detail-os">Linux</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border-glass);">
+                        <td style="color: var(--text-muted); padding: 0.5rem 0;">Primary Network</td>
+                        <td style="font-family: var(--font-mono); color: var(--accent-purple);" id="detail-ip-hostonly">192.168.56.X</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border-glass);">
+                        <td style="color: var(--text-muted); padding: 0.5rem 0;">Internet Gateway</td>
+                        <td style="font-family: var(--font-mono); color: var(--accent-cyan);" id="detail-ip-nat">10.0.2.X</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border-glass);">
+                        <td style="color: var(--text-muted); padding: 0.5rem 0;">Virtual Adaptors</td>
+                        <td id="detail-adapters">Adapter 1: Host-Only, Adapter 2: NAT</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="margin-top: 1.5rem;">
+                <h4 style="font-family: var(--font-heading); font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--text-primary);">Role and Training Objectives</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;" id="detail-description">Description of node role in lab.</p>
+            </div>
+
+            <div class="alert-warning" id="detail-warning-container" style="display: none; margin-top: 1.5rem;">
+                <div class="alert-title">⚠️ Isolation Warning</div>
+                <p style="font-size: 0.75rem; margin: 0; line-height: 1.4;" id="detail-warning-text">Isolation warning text</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Networking Modes Table Section -->
+<div class="card glass-panel" style="margin-top: 2rem; padding: 2rem;">
+    <h2 style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 500; margin-bottom: 1.5rem;">Understanding Hypervisor Virtual Networks</h2>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+        <div>
+            <h3 style="font-family: var(--font-heading); font-size: 1.1rem; color: var(--accent-cyan); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span>🌐</span> NAT Network (Network Address Translation)
+            </h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
+                In NAT mode, the hypervisor acts like a home router. The guest VMs receive IP addresses on a private subnet (typically 10.0.2.x) and can access the external internet through the host's internet connection. However, the host computer and other external systems <strong>cannot connect directly</strong> to the guest VM.
+            </p>
+        </div>
+        <div>
+            <h3 style="font-family: var(--font-heading); font-size: 1.1rem; color: var(--accent-purple); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span>🔒</span> Host-Only Network
+            </h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
+                This creates a fully loopbacked software switch. The host computer and all guest VMs connected to the Host-Only network can communicate with one another (often inside 192.168.56.x). Crucially, <strong>no internet access is available</strong>, and no external machines can route traffic into this segment. This is the optimal network for hosting targets.
+            </p>
+        </div>
+        <div>
+            <h3 style="font-family: var(--font-heading); font-size: 1.1rem; color: var(--text-primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span>🌉</span> Bridged Networking
+            </h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
+                Bridged mode connects the guest VM directly to your host's physical network adapter. The VM requests a lease from your home/office physical router (getting an IP like 192.168.1.x). The VM behaves exactly like a separate physical device on your LAN. <strong>Avoid using bridged mode</strong> for vulnerable machines like Metasploitable!
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const nodeData = {
+        host: {
+            name: "Host Computer",
+            role: "Hypervisor Host",
+            os: "Windows / macOS / Linux (Your Physical Computer)",
+            ipHostonly: "192.168.56.1 (Default Gateway)",
+            ipNat: "Not Applicable (Direct Physical IP)",
+            adapters: "Physical LAN/WiFi Adapter + Virtual Host-Only Interface",
+            description: "Your main physical workstation. It executes the hypervisor engine (VirtualBox or VMware). It acts as the gateway to the virtual Host-Only network and manages virtual storage allocation. Do not run penetration tests against this device.",
+            warning: ""
+        },
+        kali: {
+            name: "Kali Linux VM",
+            role: "Security Auditor / Attacker",
+            os: "Kali Linux (Debian-based Rolling)",
+            ipHostonly: "192.168.56.101 (Static/DHCP lease)",
+            ipNat: "10.0.2.15 (DHCP lease)",
+            adapters: "eth0 (NAT - Internet) + eth1 (Host-Only - Lab LAN)",
+            description: "The primary attack/audit simulation node. It is loaded with pentesting utilities. Running two interfaces (NAT for software package downloads and Host-Only for target auditing) allows you to update tools while keeping targets isolated.",
+            warning: "Ensure your tool targeting syntax points ONLY to 192.168.56.x to prevent outbound scans onto your physical subnet."
+        },
+        windows: {
+            name: "Windows VM",
+            role: "Defensive Target / Auditee",
+            os: "Windows 10 / Windows Server",
+            ipHostonly: "192.168.56.102 (Static/DHCP lease)",
+            ipNat: "10.0.2.4 (DHCP lease)",
+            adapters: "Ethernet 1 (NAT) + Ethernet 2 (Host-Only)",
+            description: "Used to practice active directory auditing, registry analysis, defense monitoring, and firewall telemetry. Adding dual adapters allows you to run Windows updates and install defensive endpoint detection tools.",
+            warning: "Keep Windows Defender active or implement local firewall rules to restrict ingress scanning from untrusted host-only nodes except during authorized exercises."
+        },
+        metasploitable: {
+            name: "Metasploitable VM",
+            role: "Vulnerable Practice Target",
+            os: "Ubuntu Linux (Legacy, Intentionally Unpatched)",
+            ipHostonly: "192.168.56.103 (Static/DHCP lease)",
+            ipNat: "DISCONNECTED (Blocked for safety)",
+            adapters: "eth0 (Host-Only Network) only",
+            description: "An intentionally vulnerable operating system containing obsolete versions of Apache, MySQL, Tomcat, and SSH. Used to safely practice port scanning, vulnerability validation, and log audits.",
+            warning: "NEVER connect Metasploitable to NAT or Bridged modes. Because it is highly insecure, exposing it to the open internet or your home network could invite unauthorized remote access."
+        }
+    };
+
+    function selectNode(nodeId) {
+        // Deactivate all nodes
+        document.querySelectorAll('.node').forEach(node => {
+            node.classList.remove('active');
+        });
+        
+        // Activate current node
+        const activeNode = document.getElementById(`node-${nodeId}`);
+        if (activeNode) {
+            activeNode.classList.add('active');
+        }
+        
+        // Show details
+        const data = nodeData[nodeId];
+        if (data) {
+            document.getElementById('details-default').style.display = 'none';
+            document.getElementById('details-active').style.display = 'block';
+            
+            document.getElementById('detail-name').textContent = data.name;
+            document.getElementById('detail-role').textContent = data.role;
+            document.getElementById('detail-os').textContent = data.os;
+            document.getElementById('detail-ip-hostonly').textContent = data.ipHostonly;
+            document.getElementById('detail-ip-nat').textContent = data.ipNat;
+            document.getElementById('detail-adapters').textContent = data.adapters;
+            document.getElementById('detail-description').textContent = data.description;
+            
+            const warningContainer = document.getElementById('detail-warning-container');
+            const warningText = document.getElementById('detail-warning-text');
+            if (data.warning) {
+                warningContainer.style.display = 'block';
+                warningText.textContent = data.warning;
+            } else {
+                warningContainer.style.display = 'none';
+            }
+        }
+    }
+</script>
+{% endblock %}

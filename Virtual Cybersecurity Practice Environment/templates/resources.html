@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Cheatsheets & Reference Glossary{% endblock %}
+
+{% block content %}
+<!-- Info Banner -->
+<div class="glass-panel" style="padding: 1.5rem 2rem; border-left: 4px solid var(--accent-cyan); background: rgba(0, 240, 255, 0.01); margin-bottom: 1rem;">
+    <h2 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">Student Reference Hub</h2>
+    <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;">
+        Browse our compiled security cheatsheets or search the beginner glossary to clarify terminology.
+    </p>
+</div>
+
+<!-- Tabs header -->
+<div class="card glass-panel" style="padding: 2rem;">
+    <div class="tabs-header">
+        <button class="tab-btn active" data-target="#tab-cheatsheet">Reference Cheatsheets</button>
+        <button class="tab-btn" data-target="#tab-glossary">Beginner Glossary</button>
+    </div>
+
+    <!-- Tab 1: Cheatsheets -->
+    <div class="tab-pane active" id="tab-cheatsheet">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+            <!-- Ports Cheatsheet -->
+            <div>
+                <h3 style="font-family: var(--font-heading); color: var(--accent-cyan); font-size: 1.1rem; margin-bottom: 0.75rem;">Common Ports & Services</h3>
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem; line-height: 1.6; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--border-glass);">
+                            <th style="padding: 0.4rem 0;">Port</th>
+                            <th style="padding: 0.4rem 0;">Protocol</th>
+                            <th style="padding: 0.4rem 0;">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid var(--border-glass);">
+                            <td><code>21</code></td>
+                            <td>FTP</td>
+                            <td>File Transfer (often cleartext)</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-glass);">
+                            <td><code>22</code></td>
+                            <td>SSH</td>
+                            <td>Secure Shell (encrypted CLI)</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-glass);">
+                            <td><code>23</code></td>
+                            <td>Telnet</td>
+                            <td>Cleartext Terminal Link</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-glass);">
+                            <td><code>80</code></td>
+                            <td>HTTP</td>
+                            <td>Web Server traffic (unencrypted)</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-glass);">
+                            <td><code>443</code></td>
+                            <td>HTTPS</td>
+                            <td>Encrypted Web Server traffic</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-glass);">
+                            <td><code>445</code></td>
+                            <td>SMB</td>
+                            <td>Windows File Sharing (Samba)</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border-glass);">
+                            <td><code>3306</code></td>
+                            <td>MySQL</td>
+                            <td>Database Server socket</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tool Command Cheatsheet -->
+            <div>
+                <h3 style="font-family: var(--font-heading); color: var(--accent-purple); font-size: 1.1rem; margin-bottom: 0.75rem;">Utility Quick Syntax</h3>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.8rem;">
+                    <div>
+                        <strong style="color: var(--text-primary);">Nmap (Scan top ports + OS + Scripts):</strong>
+                        <code style="display: block; background: #0f111a; padding: 0.4rem; border-radius: 4px; font-family: var(--font-mono); margin-top: 0.25rem; color: #fff;">nmap -sS -A -T4 192.168.56.103</code>
+                    </div>
+                    <div>
+                        <strong style="color: var(--text-primary);">Gobuster (Directory enumeration):</strong>
+                        <code style="display: block; background: #0f111a; padding: 0.4rem; border-radius: 4px; font-family: var(--font-mono); margin-top: 0.25rem; color: #fff;">gobuster dir -u http://192.168.56.103/ -w /usr/share/wordlists/dirb/common.txt</code>
+                    </div>
+                    <div>
+                        <strong style="color: var(--text-primary);">Netcat (Open a reverse shell listener):</strong>
+                        <code style="display: block; background: #0f111a; padding: 0.4rem; border-radius: 4px; font-family: var(--font-mono); margin-top: 0.25rem; color: #fff;">nc -lvnp 4444</code>
+                    </div>
+                    <div>
+                        <strong style="color: var(--text-primary);">Nikto (Standard web server check):</strong>
+                        <code style="display: block; background: #0f111a; padding: 0.4rem; border-radius: 4px; font-family: var(--font-mono); margin-top: 0.25rem; color: #fff;">nikto -h 192.168.56.103</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 2: Searchable Glossary -->
+    <div class="tab-pane" id="tab-glossary">
+        <div class="glossary-search-wrapper">
+            <input type="text" id="glossary-search" class="glossary-search-input" placeholder="Search terms (e.g. Adapter, Virtual)..." oninput="filterGlossary()">
+        </div>
+
+        <div class="glossary-grid" id="glossary-grid">
+            <!-- Items -->
+            <div class="card glass-panel glossary-card" data-term="hypervisor">
+                <div class="glossary-term">Hypervisor</div>
+                <div class="glossary-definition">Software (e.g., VirtualBox, VMware) that creates and runs Virtual Machines, allocating physical CPU and RAM resources.</div>
+            </div>
+            
+            <div class="card glass-panel glossary-card" data-term="host-only adapter">
+                <div class="glossary-term">Host-Only Adapter</div>
+                <div class="glossary-definition">A virtual network interface that isolates VMs on a private network communicating only with the host and other VMs. No internet routing.</div>
+            </div>
+
+            <div class="card glass-panel glossary-card" data-term="nat network address translation">
+                <div class="glossary-term">NAT (Network Address Translation)</div>
+                <div class="glossary-definition">Translates guest VM packets to the host's physical IP address, giving guest VMs internet access while hiding them from external ingress scans.</div>
+            </div>
+
+            <div class="card glass-panel glossary-card" data-term="bridged adapter">
+                <div class="glossary-term">Bridged Adapter</div>
+                <div class="glossary-definition">Binds the VM directly to the host's physical network, making the VM appear as a separate node on your home/office LAN router.</div>
+            </div>
+
+            <div class="card glass-panel glossary-card" data-term="vulnerability">
+                <div class="glossary-term">Vulnerability</div>
+                <div class="glossary-definition">A flaw or loophole in software configurations that could be validated to trigger unauthorized actions.</div>
+            </div>
+
+            <div class="card glass-panel glossary-card" data-term="port scanning">
+                <div class="glossary-term">Port Scanning</div>
+                <div class="glossary-definition">Sending packets to target socket addresses to verify if ports are open, closed, or filtered.</div>
+            </div>
+
+            <div class="card glass-panel glossary-card" data-term="packet capture pcap">
+                <div class="glossary-term">Packet Capture (PCAP)</div>
+                <div class="glossary-definition">Intercepting and logging raw data frames passing through network cards for analysis using utilities like Wireshark.</div>
+            </div>
+
+            <div class="card glass-panel glossary-card" data-term="sandbox isolation">
+                <div class="glossary-term">Sandbox Isolation</div>
+                <div class="glossary-definition">Running unpatched systems inside a sealed software environment (such as host-only VLANs) to prevent exposure.</div>
+            </div>
+
+            <div class="card glass-panel glossary-card" data-term="snapshot state backup">
+                <div class="glossary-term">Snapshot</div>
+                <div class="glossary-definition">A saved state of a virtual machine's storage and RAM, letting you rollback configuration errors instantly.</div>
+            </div>
+            
+            <div class="card glass-panel glossary-card" data-term="cleartext protocols">
+                <div class="glossary-term">Cleartext Protocols</div>
+                <div class="glossary-definition">Network protocols (like HTTP, FTP, Telnet) that transmit payloads unencrypted, allowing anyone capturing packets to read authentication details.</div>
+            </div>
+
+            <div class="card glass-panel glossary-card" data-term="dvwa damn vulnerable web application">
+                <div class="glossary-term">DVWA</div>
+                <div class="glossary-definition">Damn Vulnerable Web Application - an PHP/MySQL target application designed to practice defensive security auditing.</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function filterGlossary() {
+        const query = document.getElementById('glossary-search').value.toLowerCase().trim();
+        const cards = document.querySelectorAll('.glossary-card');
+        
+        cards.forEach(card => {
+            const term = card.getAttribute('data-term');
+            const title = card.querySelector('.glossary-term').textContent.toLowerCase();
+            const def = card.querySelector('.glossary-definition').textContent.toLowerCase();
+            
+            if (term.includes(query) || title.includes(query) || def.includes(query)) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+</script>
+{% endblock %}

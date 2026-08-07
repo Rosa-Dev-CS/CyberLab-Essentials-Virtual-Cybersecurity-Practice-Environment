@@ -1,0 +1,348 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Security Tools Arsenal{% endblock %}
+
+{% block content %}
+<div class="glass-panel" style="padding: 1.5rem 2rem; border-left: 4px solid var(--accent-purple); background: rgba(189, 0, 255, 0.01); margin-bottom: 1rem;">
+    <h2 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">Defensive Security Auditing Utilities</h2>
+    <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;">
+        Modern practitioners use specialized tools to inspect network state and identify exposure. Learn their mechanisms and construct custom command arguments in our sandbox builder.
+    </p>
+</div>
+
+<div class="tool-grid">
+    <!-- Interactive Command Builder -->
+    <div class="card glass-panel tool-builder-panel" style="padding: 2rem;">
+        <h3 style="font-family: var(--font-heading); margin-bottom: 1rem; color: var(--accent-cyan); display: flex; align-items: center; gap: 0.5rem;">
+            <span>🛠️</span> Interactive Nmap Command Builder
+        </h3>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem; line-height: 1.5;">
+            Toggle scanning configurations below. The app compiles the CLI argument structure and breaks down the purpose of each selected parameter.
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+            <!-- Target IP -->
+            <div>
+                <label style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.25rem; font-weight: 600;">Target IP Address</label>
+                <input type="text" id="nmap-target" class="glossary-search-input" value="192.168.56.103" oninput="buildNmapCommand()" style="width: 100%; font-family: var(--font-mono);">
+            </div>
+
+            <!-- Scan Type -->
+            <div>
+                <label style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.5rem; font-weight: 600;">Scan Technique</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                    <label class="tool-option">
+                        <input type="radio" name="nmap-scan-type" value="-sS" checked onchange="buildNmapCommand()">
+                        <span style="font-size: 0.8rem; font-family: var(--font-mono);">SYN Scan (-sS)</span>
+                    </label>
+                    <label class="tool-option">
+                        <input type="radio" name="nmap-scan-type" value="-sT" onchange="buildNmapCommand()">
+                        <span style="font-size: 0.8rem; font-family: var(--font-mono);">TCP Connect (-sT)</span>
+                    </label>
+                    <label class="tool-option">
+                        <input type="radio" name="nmap-scan-type" value="-sU" onchange="buildNmapCommand()">
+                        <span style="font-size: 0.8rem; font-family: var(--font-mono);">UDP Scan (-sU)</span>
+                    </label>
+                    <label class="tool-option">
+                        <input type="radio" name="nmap-scan-type" value="-sn" onchange="buildNmapCommand()">
+                        <span style="font-size: 0.8rem; font-family: var(--font-mono);">Ping Sweep (-sn)</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Ports selection -->
+            <div>
+                <label style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.5rem; font-weight: 600;">Ports Scope</label>
+                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                    <label class="tool-option" style="padding: 0.5rem 0.75rem;">
+                        <input type="radio" name="nmap-ports" value="" checked onchange="buildNmapCommand()">
+                        <span style="font-size: 0.8rem;">Default (Top 1000)</span>
+                    </label>
+                    <label class="tool-option" style="padding: 0.5rem 0.75rem;">
+                        <input type="radio" name="nmap-ports" value="-p-" onchange="buildNmapCommand()">
+                        <span style="font-size: 0.8rem; font-family: var(--font-mono);">-p- (All 65535)</span>
+                    </label>
+                    <label class="tool-option" style="padding: 0.5rem 0.75rem;">
+                        <input type="radio" name="nmap-ports" value="-p 80,443,22" onchange="buildNmapCommand()">
+                        <span style="font-size: 0.8rem;">Common Ports</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Extra Scan Flags -->
+            <div>
+                <label style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.5rem; font-weight: 600;">Information Gathering & Timing</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                    <label class="tool-option">
+                        <input type="checkbox" id="nmap-sv" checked onchange="buildNmapCommand()">
+                        <span style="font-size: 0.8rem; font-family: var(--font-mono);">Service Ver (-sV)</span>
+                    </label>
+                    <label class="tool-option">
+                        <input type="checkbox" id="nmap-o" onchange="buildNmapCommand()">
+                        <span style="font-size: 0.8rem; font-family: var(--font-mono);">OS Detect (-O)</span>
+                    </label>
+                    <label class="tool-option">
+                        <input type="checkbox" id="nmap-sc" checked onchange="buildNmapCommand()">
+                        <span style="font-size: 0.8rem; font-family: var(--font-mono);">Default Scripts (-sC)</span>
+                    </label>
+                    <label class="tool-option">
+                        <input type="checkbox" id="nmap-pn" onchange="buildNmapCommand()">
+                        <span style="font-size: 0.8rem; font-family: var(--font-mono);">Disable Ping (-Pn)</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generated Syntax Panel -->
+        <div style="margin-top: 1rem;">
+            <label style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.25rem; font-weight: 600;">Compiled Terminal Command</label>
+            <div class="tool-cmd-output" id="nmap-cmd-text">nmap -sS -sV -sC 192.168.56.103</div>
+            <button class="copy-btn" onclick="copyNmapCmd(this)">Copy Command</button>
+        </div>
+    </div>
+
+    <!-- Tool Catalog accordion -->
+    <div class="accordion accordion-exclusive" style="height: 100%; overflow-y: auto;">
+        <!-- Nmap -->
+        <div class="accordion-item glass-panel open">
+            <button class="accordion-trigger">
+                <span>Nmap (Network Mapper)</span>
+                <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div class="accordion-content">
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0.75rem;">
+                    <strong>Purpose:</strong> Port exploration, host detection, and network security auditing.<br>
+                    <strong>Safe Practice Context:</strong> Run scans only inside the Host-Only network range against Metasploitable (<code>192.168.56.103</code>). Do not run scan parameters against public IP scopes without approval.
+                </p>
+                <div style="font-size: 0.8rem; border-top: 1px solid var(--border-glass); padding-top: 0.5rem;">
+                    <span style="font-weight: 600; color: var(--accent-cyan);">Common Scan Syntax:</span>
+                    <code style="display: block; background: #0f111a; padding: 0.4rem; border-radius: 4px; font-family: var(--font-mono); margin-top: 0.25rem; color: #fff;">nmap -sS -sV -p 1-1024 192.168.56.103</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wireshark -->
+        <div class="accordion-item glass-panel">
+            <button class="accordion-trigger">
+                <span>Wireshark (Packet Sniffer)</span>
+                <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div class="accordion-content">
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0.75rem;">
+                    <strong>Purpose:</strong> Interactive network packet parsing and protocol dissection.<br>
+                    <strong>Safe Practice Context:</strong> Capture frames passing through virtual adapter <code>eth1</code> (Host-Only interface). Examine DNS queries, HTTP headers, and TCP handshakes.
+                </p>
+                <div style="font-size: 0.8rem; border-top: 1px solid var(--border-glass); padding-top: 0.5rem;">
+                    <span style="font-weight: 600; color: var(--accent-cyan);">Learning Filter Syntax:</span>
+                    <code style="display: block; background: #0f111a; padding: 0.4rem; border-radius: 4px; font-family: var(--font-mono); margin-top: 0.25rem; color: #fff;">http || dns || tcp.port == 80</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- Burp Suite -->
+        <div class="accordion-item glass-panel">
+            <button class="accordion-trigger">
+                <span>Burp Suite (Interception Proxy)</span>
+                <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div class="accordion-content">
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0.75rem;">
+                    <strong>Purpose:</strong> Analyze web requests, intercept HTTP traffic, and map API endpoints.<br>
+                    <strong>Safe Practice Context:</strong> Set your local web browser proxy settings to <code>127.0.0.1:8080</code> and interact with vulnerable web apps hosted within Metasploitable (such as DVWA).
+                </p>
+                <div style="font-size: 0.8rem; border-top: 1px solid var(--border-glass); padding-top: 0.5rem;">
+                    <span style="font-weight: 600; color: var(--accent-cyan);">Proxy Configuration:</span>
+                    <code style="display: block; background: #0f111a; padding: 0.4rem; border-radius: 4px; font-family: var(--font-mono); margin-top: 0.25rem; color: #fff;">127.0.0.1:8080 (HTTP intercepting proxy)</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nikto -->
+        <div class="accordion-item glass-panel">
+            <button class="accordion-trigger">
+                <span>Nikto (Web Server Scanner)</span>
+                <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div class="accordion-content">
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0.75rem;">
+                    <strong>Purpose:</strong> Rapid vulnerability scanning of web servers for outdated scripts, files, and server headers.<br>
+                    <strong>Safe Practice Context:</strong> Direct tests only to web servers hosted in the target VM.
+                </p>
+                <div style="font-size: 0.8rem; border-top: 1px solid var(--border-glass); padding-top: 0.5rem;">
+                    <span style="font-weight: 600; color: var(--accent-cyan);">Scan Command:</span>
+                    <code style="display: block; background: #0f111a; padding: 0.4rem; border-radius: 4px; font-family: var(--font-mono); margin-top: 0.25rem; color: #fff;">nikto -h http://192.168.56.103/</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gobuster -->
+        <div class="accordion-item glass-panel">
+            <button class="accordion-trigger">
+                <span>Gobuster (Directory Finder)</span>
+                <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div class="accordion-content">
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0.75rem;">
+                    <strong>Purpose:</strong> Enumerate hidden web server folders and files by brute-forcing directories using list mappings.<br>
+                    <strong>Safe Practice Context:</strong> Target local development instances only.
+                </p>
+                <div style="font-size: 0.8rem; border-top: 1px solid var(--border-glass); padding-top: 0.5rem;">
+                    <span style="font-weight: 600; color: var(--accent-cyan);">Enumerate Directory command:</span>
+                    <code style="display: block; background: #0f111a; padding: 0.4rem; border-radius: 4px; font-family: var(--font-mono); margin-top: 0.25rem; color: #fff;">gobuster dir -u http://192.168.56.103/ -w /usr/share/wordlists/dirb/common.txt</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- Netcat -->
+        <div class="accordion-item glass-panel">
+            <button class="accordion-trigger">
+                <span>Netcat (TCP/UDP Swiss Army Knife)</span>
+                <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div class="accordion-content">
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0.75rem;">
+                    <strong>Purpose:</strong> Open network connections, establish listeners, transfer files, and troubleshoot sockets.<br>
+                    <strong>Safe Practice Context:</strong> Setting up localized loopback tests to examine connection flow.
+                </p>
+                <div style="font-size: 0.8rem; border-top: 1px solid var(--border-glass); padding-top: 0.5rem;">
+                    <span style="font-weight: 600; color: var(--accent-cyan);">Listen command:</span>
+                    <code style="display: block; background: #0f111a; padding: 0.4rem; border-radius: 4px; font-family: var(--font-mono); margin-top: 0.25rem; color: #fff;">nc -lvnp 4444</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metasploit -->
+        <div class="accordion-item glass-panel">
+            <button class="accordion-trigger">
+                <span>Metasploit Framework</span>
+                <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div class="accordion-content">
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0.75rem;">
+                    <strong>Purpose:</strong> Test exploit code against authorized targets, validate system vulnerabilities, and check patch integrity.<br>
+                    <strong>Safe Practice Context:</strong> Run verification commands targeting Metasploitable exclusively inside your private host-only adapter block.
+                </p>
+                <div style="font-size: 0.8rem; border-top: 1px solid var(--border-glass); padding-top: 0.5rem;">
+                    <span style="font-weight: 600; color: var(--accent-cyan);">Launch Framework:</span>
+                    <code style="display: block; background: #0f111a; padding: 0.4rem; border-radius: 4px; font-family: var(--font-mono); margin-top: 0.25rem; color: #fff;">msfconsole</code>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tools Progress Checks -->
+<div class="card glass-panel" style="margin-top: 2rem; padding: 2rem;">
+    <h3 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">Tools Mastery Checkpoints</h3>
+    <div class="grid-container" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+        <label class="step-card" style="cursor: pointer; padding: 0.75rem;">
+            <input type="checkbox" class="step-checkbox" id="check-tool-nmap" onchange="syncCheck('tool_nmap')" {% if progress.tool_nmap %}checked{% endif %}>
+            <div class="step-content"><div class="step-title" style="font-size: 0.9rem;">Nmap Scanner</div></div>
+        </label>
+        <label class="step-card" style="cursor: pointer; padding: 0.75rem;">
+            <input type="checkbox" class="step-checkbox" id="check-tool-wireshark" onchange="syncCheck('tool_wireshark')" {% if progress.tool_wireshark %}checked{% endif %}>
+            <div class="step-content"><div class="step-title" style="font-size: 0.9rem;">Wireshark Packet</div></div>
+        </label>
+        <label class="step-card" style="cursor: pointer; padding: 0.75rem;">
+            <input type="checkbox" class="step-checkbox" id="check-tool-burp" onchange="syncCheck('tool_burp')" {% if progress.tool_burp %}checked{% endif %}>
+            <div class="step-content"><div class="step-title" style="font-size: 0.9rem;">Burp Web Proxy</div></div>
+        </label>
+        <label class="step-card" style="cursor: pointer; padding: 0.75rem;">
+            <input type="checkbox" class="step-checkbox" id="check-tool-nikto" onchange="syncCheck('tool_nikto')" {% if progress.tool_nikto %}checked{% endif %}>
+            <div class="step-content"><div class="step-title" style="font-size: 0.9rem;">Nikto Vuln Scan</div></div>
+        </label>
+        <label class="step-card" style="cursor: pointer; padding: 0.75rem;">
+            <input type="checkbox" class="step-checkbox" id="check-tool-gobuster" onchange="syncCheck('tool_gobuster')" {% if progress.tool_gobuster %}checked{% endif %}>
+            <div class="step-content"><div class="step-title" style="font-size: 0.9rem;">Gobuster Enumerate</div></div>
+        </label>
+        <label class="step-card" style="cursor: pointer; padding: 0.75rem;">
+            <input type="checkbox" class="step-checkbox" id="check-tool-netcat" onchange="syncCheck('tool_netcat')" {% if progress.tool_netcat %}checked{% endif %}>
+            <div class="step-content"><div class="step-title" style="font-size: 0.9rem;">Netcat sockets</div></div>
+        </label>
+        <label class="step-card" style="cursor: pointer; padding: 0.75rem;">
+            <input type="checkbox" class="step-checkbox" id="check-tool-metasploit" onchange="syncCheck('tool_metasploit')" {% if progress.tool_metasploit %}checked{% endif %}>
+            <div class="step-content"><div class="step-title" style="font-size: 0.9rem;">Metasploit VM Target</div></div>
+        </label>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function syncCheck(itemKey) {
+        const checkbox = document.getElementById(`check-${itemKey.replace(/_/g, '-')}`);
+        if (checkbox) {
+            toggleProgressItem(itemKey, checkbox.checked);
+        }
+    }
+
+    function buildNmapCommand() {
+        const target = document.getElementById('nmap-target').value.trim() || '192.168.56.103';
+        
+        // Scan type
+        const typeRadios = document.getElementsByName('nmap-scan-type');
+        let scanType = '-sS';
+        for (const r of typeRadios) {
+            if (r.checked) {
+                scanType = r.value;
+                break;
+            }
+        }
+
+        // Ports scope
+        const portRadios = document.getElementsByName('nmap-ports');
+        let ports = '';
+        for (const p of portRadios) {
+            if (p.checked) {
+                ports = p.value;
+                break;
+            }
+        }
+
+        // Information Gathering Checkboxes
+        const sv = document.getElementById('nmap-sv').checked ? '-sV' : '';
+        const o = document.getElementById('nmap-o').checked ? '-O' : '';
+        const sc = document.getElementById('nmap-sc').checked ? '-sC' : '';
+        const pn = document.getElementById('nmap-pn').checked ? '-Pn' : '';
+
+        // Assemble command line array
+        let cmdParts = ['nmap'];
+        
+        // Add scan type
+        cmdParts.push(scanType);
+        
+        // Add ports if set
+        if (ports) cmdParts.push(ports);
+        
+        // Add service version, default scripts, OS, and Ping options
+        if (sv) cmdParts.push(sv);
+        if (sc) cmdParts.push(sc);
+        if (o) cmdParts.push(o);
+        if (pn) cmdParts.push(pn);
+        
+        // Target IP
+        cmdParts.push(target);
+
+        // Filter out empty parts
+        const fullCmd = cmdParts.filter(p => p !== '').join(' ');
+        
+        // Update syntax box
+        document.getElementById('nmap-cmd-text').textContent = fullCmd;
+    }
+
+    function copyNmapCmd(btn) {
+        const cmd = document.getElementById('nmap-cmd-text').textContent;
+        copyToClipboard(cmd, btn);
+        
+        // Auto tick Nmap checkpoint when they play with the builder
+        const nmapChk = document.getElementById('check-tool-nmap');
+        if (nmapChk && !nmapChk.checked) {
+            nmapChk.checked = true;
+            toggleProgressItem('tool_nmap', true);
+        }
+    }
+
+    // Initialize build on load
+    window.addEventListener('DOMContentLoaded', buildNmapCommand);
+</script>
+{% endblock %}

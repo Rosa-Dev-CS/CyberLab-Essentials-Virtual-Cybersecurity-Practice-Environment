@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Security Operation Dashboard{% endblock %}
+
+{% block content %}
+<!-- Top Stats Row -->
+<div class="grid-container" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
+    <!-- Overall Progress Ring Card -->
+    <div class="card glass-panel" style="flex-direction: row; align-items: center; gap: 1.5rem;">
+        <div class="progress-ring-container">
+            <svg class="progress-ring" width="120" height="120">
+                <circle class="progress-ring__circle-bg" stroke="rgba(255,255,255,0.05)" stroke-width="8" fill="transparent" r="50" cx="60" cy="60"/>
+                <circle class="progress-ring__circle" id="dashboard-progress-circle" stroke="var(--accent-cyan)" stroke-width="8" fill="transparent" r="50" cx="60" cy="60"
+                        stroke-dasharray="314.16" stroke-dashoffset="{{ 314.16 - (314.16 * stats.progress_percent / 100) }}"/>
+            </svg>
+            <div class="progress-ring-text" id="dashboard-progress-text">{{ stats.progress_percent }}%</div>
+        </div>
+        <div>
+            <h3 style="font-family: var(--font-heading); font-size: 1.1rem; margin-bottom: 0.25rem;">Overall Training</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);">Syllabus modules completed</p>
+            <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.5rem;" id="dashboard-progress-count">{{ stats.completed_items }} / {{ stats.total_items }} checkpoints</span>
+        </div>
+    </div>
+
+    <!-- Completed Labs Counter -->
+    <div class="card glass-panel" style="flex-direction: row; align-items: center; gap: 1.5rem;">
+        <div class="card-icon" style="background: rgba(0, 230, 118, 0.1); border-color: rgba(0, 230, 118, 0.2); width: 60px; height: 60px; border-radius: 50%;">
+            <svg viewBox="0 0 24 24" style="stroke: var(--accent-green); fill: none; stroke-width: 2; width: 30px; height: 30px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        </div>
+        <div>
+            <h3 style="font-family: var(--font-heading); font-size: 1.1rem; margin-bottom: 0.25rem;">Completed Labs</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);">Practical scenarios passed</p>
+            <span style="font-size: 1.5rem; font-weight: bold; color: var(--accent-green); font-family: var(--font-heading); display: block; margin-top: 0.25rem;" id="dashboard-labs-count">{{ stats.completed_labs }} / {{ stats.total_labs }}</span>
+        </div>
+    </div>
+
+    <!-- Active Virtual Labs Network Node Info -->
+    <div class="card glass-panel" style="flex-direction: row; align-items: center; gap: 1.5rem;">
+        <div class="card-icon" style="background: rgba(189, 0, 255, 0.1); border-color: rgba(189, 0, 255, 0.2); width: 60px; height: 60px; border-radius: 50%;">
+            <svg viewBox="0 0 24 24" style="stroke: var(--accent-purple); fill: none; stroke-width: 2; width: 30px; height: 30px;"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+        </div>
+        <div>
+            <h3 style="font-family: var(--font-heading); font-size: 1.1rem; margin-bottom: 0.25rem;">Isolated Lab Net</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);">Network Configuration Mode</p>
+            <span style="font-size: 0.85rem; font-weight: 600; color: var(--accent-purple); font-family: var(--font-mono); display: block; margin-top: 0.4rem;">HOST-ONLY / NAT</span>
+        </div>
+    </div>
+</div>
+
+<!-- Main Area Grid -->
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-top: 1rem;">
+    <!-- Navigation Cards & Study Plan -->
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        <h2 style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 500;">Learning Modules</h2>
+        
+        <div class="grid-container" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
+            <!-- Lab Architecture Link -->
+            <div class="card glass-panel">
+                <div class="card-header">
+                    <h3 class="card-title">1. Topology & Design</h3>
+                    <div class="card-icon" style="color: var(--accent-cyan);"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></svg></div>
+                </div>
+                <p class="card-desc">Visualize your host computer, routing settings, adapters (Host-only, Bridged, NAT) and security virtual machines.</p>
+                <a href="{{ url_for('architecture') }}" class="card-link">View Architecture <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></a>
+            </div>
+
+            <!-- Setup Guides Link -->
+            <div class="card glass-panel">
+                <div class="card-header">
+                    <h3 class="card-title">2. Installation Guide</h3>
+                    <div class="card-icon" style="color: var(--accent-purple);"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></svg></div>
+                </div>
+                <p class="card-desc">Step-by-step documentation for hypervisors, import Kali, spin up Windows, and configure safe snapshots.</p>
+                <a href="{{ url_for('installation') }}" class="card-link">Start Installation <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></a>
+            </div>
+
+            <!-- Linux CLI Shell Simulator Link -->
+            <div class="card glass-panel">
+                <div class="card-header">
+                    <h3 class="card-title">3. Linux Command Center</h3>
+                    <div class="card-icon" style="color: var(--accent-orange);"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg></div>
+                </div>
+                <p class="card-desc">Learn commands for file actions, permission handling, process trees, networking config, and packages inside a live simulator.</p>
+                <a href="{{ url_for('linux') }}" class="card-link">Simulate Terminal <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></a>
+            </div>
+
+            <!-- Networking Link -->
+            <div class="card glass-panel">
+                <div class="card-header">
+                    <h3 class="card-title">4. Network Essentials</h3>
+                    <div class="card-icon" style="color: var(--accent-cyan);"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M20 4L8.12 15.88M14.47 14.48L20 20M8.12 8.12L12 12"></svg></div>
+                </div>
+                <p class="card-desc">Study IP addressing, DHCP operations, subnets, routing routes, and NAT vs host-only boundaries.</p>
+                <a href="{{ url_for('networking') }}" class="card-link">Review Networking <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></a>
+            </div>
+
+            <!-- Security Tools -->
+            <div class="card glass-panel">
+                <div class="card-header">
+                    <h3 class="card-title">5. Security Tools Arsenal</h3>
+                    <div class="card-icon" style="color: var(--accent-purple);"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></svg></div>
+                </div>
+                <p class="card-desc">Synthesize defensive scans using Nmap, analyze Wireshark flows, and construct Burp Suite test cases.</p>
+                <a href="{{ url_for('tools') }}" class="card-link">Inspect Tools <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></a>
+            </div>
+
+            <!-- Practice Labs -->
+            <div class="card glass-panel">
+                <div class="card-header">
+                    <h3 class="card-title">6. Guided Practice Labs</h3>
+                    <div class="card-icon" style="color: var(--accent-green);"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></svg></div>
+                </div>
+                <p class="card-desc">Execute discovery scans, document vulnerabilities, and review packet dumps safely inside your private hypervisor.</p>
+                <a href="{{ url_for('labs') }}" class="card-link">Launch Labs <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Side Panel (Recent Notes & Ethics Disclaimer) -->
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        <!-- Ethical Learning Shield -->
+        <div class="card glass-panel" style="border: 1px solid rgba(0, 240, 255, 0.15); background: rgba(0, 240, 255, 0.02);">
+            <div style="display: flex; align-items: center; gap: 0.75rem; color: var(--accent-cyan); font-family: var(--font-heading); font-weight: bold; margin-bottom: 0.5rem;">
+                <span>🛡️ ETHICAL CONDUCT AGREEMENT</span>
+            </div>
+            <p style="font-size: 0.8rem; line-height: 1.5; color: var(--text-secondary); margin-bottom: 0;">
+                This virtual cybersecurity environment is intended exclusively for authorized learning and laboratory emulation. Testing security utilities against external systems without prior explicit authorization is prohibited. Keep your virtual network adapter isolated (Host-only / Internal).
+            </p>
+        </div>
+
+        <!-- Recent Activity / Notes -->
+        <div class="card glass-panel" style="flex-grow: 1;">
+            <div class="card-header" style="margin-bottom: 1rem;">
+                <h3 class="card-title" style="font-size: 1.1rem;">Recent Journal Notes</h3>
+                <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; stroke: var(--text-muted); fill: none; stroke-width: 2;"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></svg>
+            </div>
+            
+            {% if recent_notes %}
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                {% for note in recent_notes %}
+                <a href="{{ url_for('notes', note_id=note.id) }}" style="text-decoration: none; color: inherit; display: block; border-bottom: 1px solid var(--border-glass); padding-bottom: 0.75rem; transition: var(--transition-smooth);" class="note-feed-link">
+                    <h4 style="font-size: 0.9rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ note.title }}</h4>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);">
+                        <span>Updated {{ note.updated_at.split(' ')[0] }}</span>
+                        <span>📷 {{ note.screenshot_count }} images</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; margin: auto 0;">
+                No lab notes recorded yet.<br>
+                <a href="{{ url_for('notes') }}" style="color: var(--accent-purple); text-decoration: none; font-weight: 500;">Start writing your first journal entry</a>.
+            </p>
+            {% endif %}
+            
+            <a href="{{ url_for('notes') }}" class="card-link" style="margin-top: 1.5rem; font-size: 0.85rem;">Go to Lab Journal <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Handle live dashboard progress animation updating on toggle events
+    window.addEventListener('progressUpdated', (e) => {
+        const stats = e.detail.stats;
+        
+        // Update circle animation
+        const circle = document.getElementById('dashboard-progress-circle');
+        const text = document.getElementById('dashboard-progress-text');
+        const count = document.getElementById('dashboard-progress-count');
+        const labsCount = document.getElementById('dashboard-labs-count');
+        
+        if (circle) {
+            const radius = circle.r.baseVal.value;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference - (circumference * stats.progress_percent / 100);
+            circle.style.strokeDashoffset = offset;
+        }
+        
+        if (text) text.textContent = `${stats.progress_percent}%`;
+        if (count) count.textContent = `${stats.completed_items} / ${stats.total_items} checkpoints`;
+        if (labsCount) labsCount.textContent = `${stats.completed_labs} / ${stats.total_labs}`;
+    });
+</script>
+<style>
+    .progress-ring__circle {
+        transition: stroke-dashoffset 0.8s ease-in-out;
+        transform: rotate(-90deg);
+        transform-origin: 50% 50%;
+    }
+    .note-feed-link:hover h4 {
+        color: var(--accent-cyan) !important;
+    }
+</style>
+{% endblock %}
